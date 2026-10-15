@@ -34,3 +34,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local planning notes (not part of the repo)
+/.temp/
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# supabase local
+/supabase/.branches
+/supabase/.temp
