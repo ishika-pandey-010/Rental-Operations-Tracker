@@ -38,7 +38,7 @@ All tables have `id uuid`, `owner_id uuid default auth.uid()`, `created_at`, `cr
 | `payments` | lease_id, amount_cents, paid_on, method (`bank_transfer`, `cash`, `cheque`, `card`, `other`), reference | Unique index on `(lease_id, lower(btrim(reference)))` where a reference is given stops double entry, so "TRX-881" and "trx-881 " collide (D-24); `amount_cents > 0`; only on active or ended leases | FR-10 |
 | `payment_reversals` | payment_id (unique), reason, reversed_on | One reversal per payment. An after-insert trigger releases everything the payment paid with negative allocation rows, however the reversal was written, then lets other credit fill the reopened charges. A reversed payment can't be allocated again | FR-13 |
 | `payment_allocations` | payment_id, charge_id, amount_cents (±) | Trigger: net allocations to a charge ≤ its adjusted amount, and net allocations from a payment ≤ the payment. Negative rows release money back to credit | FR-11, FR-12 |
-| `deposits` | lease_id, amount_cents, received_on | One row per instalment; deposit held = sum | FR-14 |
+| `deposits` | lease_id, amount_cents, received_on, note, carried_from_lease_id | One row per instalment; append-only; not on an ended lease. A renewal that carries the deposit over writes one row on the new lease pointing at the old one; held = received − carried over to a renewal | FR-14, FR-18 |
 | `deposit_deductions` | lease_id, amount_cents, reason | `reason` NOT NULL and not blank; only on an ended lease and before the refund is paid. An after-insert trigger charges any part of the deductions above the deposit that isn't charged yet as a `deposit_shortfall` charge, then applies credit | FR-15, FR-16 |
 | `refunds` | lease_id (unique), amount_cents, paid_on | One row, written when the refund is paid, never edited (D-20). Trigger: the lease has ended and `amount_cents = max(0, deposit held − deductions)`. `pending` is derived in `lease_refund_status` | FR-16 |
 
@@ -50,7 +50,7 @@ Nothing below is stored. Each is a SQL view so the numbers can't drift from the 
 
 | View | Returns | Used by |
 | --- | --- | --- |
-| `lease_deposit_summary` | per lease: deposits received, deposit held | Lease page (US-17) |
+| `lease_deposit_summary` | per lease: deposits received, deposit held (received minus anything carried over to a renewal) | Lease page (US-17), refunds |
 | `charge_balances` | per charge: amount, adjustments, value (amount + adjustments), allocated, balance, status (`open`, `partial`, `paid`, or `cancelled` when adjustments bring the value to 0) | Lease page, reports |
 | `payment_balances` | per payment: amount, value (0 once reversed), allocated, unallocated | Credit, auto-apply |
 | `lease_credit` | per lease: payments not reversed − net allocations | Ledger, credit auto-apply |

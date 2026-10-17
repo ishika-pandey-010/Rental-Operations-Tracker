@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Flash } from "@/components/form";
 import { formatMoney, centsToInput } from "@/lib/money";
-import { firstOfNextMonth, monthName, todayISO } from "@/lib/dates";
+import { firstOfNextMonth, monthName, oneYearLeaseEnd, todayISO } from "@/lib/dates";
 import { getLease, unitName } from "../data";
 import { ActivateButton, DepositForm, WaiverForm } from "../forms";
 import { ChargesTable, LedgerTable, type ChargeBalance, type LedgerRow } from "./money";
@@ -11,6 +11,7 @@ import { PaymentForm } from "./payment-form";
 import { MoveOutForm } from "./move-out-form";
 import { DeductionForm, RefundForm } from "./settlement";
 import { RentChangeForm } from "./rent-form";
+import { RenewForm } from "./renew-form";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -49,6 +50,12 @@ export default async function LeasePage({
       .eq("lease_id", id)
       .single(),
     supabase.from("deposit_deductions").select("id, amount_cents, reason, created_at").eq("lease_id", id).order("created_at"),
+  ]);
+  const [{ data: renewedBy }, { data: renewedFrom }] = await Promise.all([
+    supabase.from("leases").select("id, start_date").eq("renewed_from_id", id).maybeSingle(),
+    lease.renewed_from_id
+      ? supabase.from("leases").select("id, end_date").eq("id", lease.renewed_from_id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
   const { data: reversedRows } = await supabase.from("payment_balances").select("payment_id").eq("lease_id", id).eq("reversed", true);
   const reversed = new Set((reversedRows ?? []).map((r) => r.payment_id as string));
@@ -138,6 +145,16 @@ export default async function LeasePage({
             <strong>Moved out {lease.move_out_date}</strong>
           </p>
         )}
+        {renewedFrom && (
+          <p>
+            <Link href={`/leases/${renewedFrom.id}`}>Renewal of the lease ending {renewedFrom.end_date}</Link>
+          </p>
+        )}
+        {renewedBy && (
+          <p>
+            <Link href={`/leases/${renewedBy.id}`}>Renewed by the lease from {renewedBy.start_date}</Link>
+          </p>
+        )}
         <ul>
           {rent.map((r) => (
             <li key={r.effective_period}>
@@ -184,7 +201,10 @@ export default async function LeasePage({
               <tbody>
                 {deposits.map((d) => (
                   <tr key={d.id}>
-                    <td>{d.received_on}</td>
+                    <td>
+                      {d.received_on}
+                      {d.note && <span className="hint">{d.note}</span>}
+                    </td>
                     <td className="num">{formatMoney(d.amount_cents)}</td>
                   </tr>
                 ))}
@@ -268,6 +288,26 @@ export default async function LeasePage({
           <WaiverForm leaseId={lease.id} today={today} />
         )}
       </section>
+
+      {lease.status === "active" && (
+        <section className="card" aria-labelledby="renew-h">
+          <h2 id="renew-h" style={{ marginTop: 0 }}>
+            Renew
+          </h2>
+          <RenewForm
+            leaseId={lease.id}
+            heldCents={summary?.held_cents ?? 0}
+            defaults={(() => {
+              const start = new Date(Date.parse(`${lease.end_date}T00:00:00Z`) + 86400000).toISOString().slice(0, 10);
+              return {
+                start_date: start,
+                end_date: oneYearLeaseEnd(start),
+                rent: centsToInput(rent[rent.length - 1]?.monthly_rent_cents),
+              };
+            })()}
+          />
+        </section>
+      )}
 
       {lease.status === "active" && (
         <section className="card" aria-labelledby="moveout-h">

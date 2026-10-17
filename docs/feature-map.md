@@ -24,7 +24,7 @@ One row per feature, in build order. The user is the self-managing landlord from
 | US-19 | Refund or amount owed | Pay back exactly the right amount | Refund = deposit − deductions, `pending` until paid; deductions above the deposit become a "Deductions above deposit" charge; database refuses a wrong amount | Must | S3 | done |
 | US-20 | Overdue rent | Know who to chase today | Each overdue charge with tenant, unit, balance, days overdue; paid and not-yet-due charges left out | Must | S3 | done |
 | US-21 | Pending refunds | Not forget a refund | Ended leases with a deposit and no refund paid, with amount and days since end; drops off once paid | Must | S3 | done |
-| US-08 | Renew a lease | Start a new term without retyping the tenancy | New lease linked to the old; old ends on its end date; deposit can carry over with no refund on the old lease | Should | S3 | not started |
+| US-08 | Renew a lease | Start a new term without retyping the tenancy | New lease linked to the old; old ends on its end date; deposit can carry over with no refund on the old lease | Should | S3 | done |
 | US-22 | CSV export | Send the numbers to an accountant | Ledger and both reports download with the same rows and columns, amounts as decimals | Should | S3 | not started |
 | US-23 | Dashboard | See the month at a glance | Units occupied, rent due this month, total overdue, deposits held, each linking to its detail | Could | S3 | not started |
 | NFR-09 | Demo seed | Rebuild the demo after the free database is reset | One command builds a demo account with 12+ months of history | Must | S3 | not started |
