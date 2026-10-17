@@ -90,3 +90,29 @@ export async function generateCharges(page: Page, month: string) {
   await page.getByLabel("Month").fill(month);
   await page.getByRole("button", { name: "Generate rent" }).click();
 }
+
+/** Records a payment from the lease page. */
+export async function recordPaymentUI(
+  page: Page,
+  p: { amount: string; paidOn?: string; method?: string; reference?: string; manual?: Record<string, string> },
+) {
+  const form = page.getByRole("region", { name: "Record a payment" });
+  await form.getByLabel("Amount received").fill(p.amount);
+  if (p.paidOn) await form.getByLabel("Paid on").fill(p.paidOn);
+  if (p.method) await form.getByLabel("Method").selectOption({ label: p.method });
+  if (p.reference !== undefined) await form.getByLabel("Reference").fill(p.reference);
+  if (p.manual) {
+    await form.getByLabel("Choose which charges it pays").check();
+    for (const [charge, amount] of Object.entries(p.manual)) await form.getByLabel(`Amount for ${charge}`).fill(amount);
+  }
+  await form.getByRole("button", { name: "Record payment" }).click();
+}
+
+/** Signs up, adds a unit and tenant, activates a lease from 2026-11-01 and charges the given months. Returns the lease URL. */
+export async function leaseWithCharges(page: Page, months: string[]) {
+  await addPropertyAndTenant(page, { units: "A" });
+  const url = await createActiveLease(page);
+  for (const m of months) await generateCharges(page, m);
+  await page.goto(url);
+  return url;
+}

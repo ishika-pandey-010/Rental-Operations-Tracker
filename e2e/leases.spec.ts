@@ -186,3 +186,16 @@ test.describe("User review: fewer steps to an active lease", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+test("Given I just activated a lease, when I record a payment next, then only the payment's confirmation is shown", async ({ page }) => {
+  await addPropertyAndTenant(page, { units: "A" });
+  await createDraftLease(page);
+  const deposit = page.getByRole("region", { name: "Deposit" });
+  await deposit.getByLabel("Amount").fill("1,200.00");
+  await deposit.getByRole("button", { name: "Record and activate" }).click();
+  await expect(statusIn(page)).toHaveText("Deposit of $1,200.00 recorded. Lease is active.");
+  await expect(page).not.toHaveURL(/done=/);
+  await page.getByLabel("Amount received").fill("100");
+  await page.getByRole("button", { name: "Record payment" }).click();
+  await expect(statusIn(page)).toHaveText("Payment of $100.00 recorded");
+});

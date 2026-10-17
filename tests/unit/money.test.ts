@@ -43,3 +43,17 @@ describe("formatMoney shows cents as currency", () => {
     expect(formatMoney(120000, null)).toBe("1200.00");
   });
 });
+
+import { positiveAmount } from "@/lib/money";
+
+describe("positiveAmount gives the AC wording for zero and negatives (TC-PAY-03)", () => {
+  it.each(["0", "0.00", "-5.00", "-1,200"])("Given %s, then it says 'Amount must be more than zero'", (typed) => {
+    expect(positiveAmount(typed)).toEqual({ error: "Amount must be more than zero" });
+  });
+  it("Given junk, then it gives an example", () => {
+    expect(positiveAmount("abc", "payment")).toEqual({ error: "Enter the payment as an amount like 1,200.00" });
+  });
+  it("Given 1,200.00, then it's 120000 cents", () => {
+    expect(positiveAmount("1,200.00")).toEqual({ cents: 120000 });
+  });
+});

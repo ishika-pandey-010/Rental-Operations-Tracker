@@ -35,3 +35,21 @@ export function monthName(isoDate: string): string {
   const { y, m } = parts(isoDate.length === 7 ? `${isoDate}-01` : isoDate);
   return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(Date.UTC(y, m - 1, 1)));
 }
+
+/** A timestamp as 'YYYY-MM-DD HH:mm' in APP_TIMEZONE (NFR-05: when a row was recorded). */
+export function formatTimestamp(ts: string, timeZone = process.env.APP_TIMEZONE || "UTC"): string {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(new Date(ts))
+      .map((x) => [x.type, x.value]),
+  );
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`;
+}

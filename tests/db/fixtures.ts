@@ -87,3 +87,43 @@ export async function rentCharges(db: Db, leaseId: string) {
     [leaseId],
   );
 }
+
+export type PaymentInput = {
+  paidOn?: string;
+  method?: string;
+  reference?: string | null;
+  allocations?: { charge_id: string; amount_cents: number }[];
+};
+
+export async function recordPayment(db: Db, leaseId: string, cents: number, p: PaymentInput = {}) {
+  const { id } = await db.one<{ id: string }>("select record_payment($1, $2, $3, $4, $5, $6) as id", [
+    leaseId,
+    cents,
+    p.paidOn ?? "2026-12-02",
+    p.method ?? "bank_transfer",
+    p.reference === undefined ? null : p.reference,
+    p.allocations ? JSON.stringify(p.allocations) : null,
+  ]);
+  return id;
+}
+
+export async function balance(db: Db, chargeId: string) {
+  return db.one<{ allocated_cents: number; balance_cents: number; status: string }>(
+    "select allocated_cents, balance_cents, status from charge_balances where charge_id = $1",
+    [chargeId],
+  );
+}
+
+export async function credit(db: Db, leaseId: string) {
+  return (await db.one<{ credit_cents: number }>("select credit_cents from lease_credit where lease_id = $1", [leaseId]))
+    .credit_cents;
+}
+
+/** An active lease from 2026-11-01 at 1,200.00 with November and December charged. */
+export async function leaseWithNovDec(db: Db) {
+  const lease = await activeLease(db);
+  await generate(db, "2026-11-01");
+  await generate(db, "2026-12-01");
+  const [nov, dec] = await rentCharges(db, lease.leaseId);
+  return { ...lease, nov: nov.id, dec: dec.id };
+}
