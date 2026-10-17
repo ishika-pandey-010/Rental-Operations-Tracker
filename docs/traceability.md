@@ -30,7 +30,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-20 | Must | Pending refunds report: every ended lease whose refund is not paid. | US-21 | TC-RPT-04, TC-RPT-05 | 2 of 2 | — |
 | FR-21 | Must | Lease ledger view: charges, payments, allocations and running balan… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
 | FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 1 of 1 | — |
-| FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 0 of 1 | — |
+| FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 1 of 1 | — |
 | NFR-01 | Must | Money is stored as integer minor units. No floating-point arithmeti… | — | TC-NFR-08 | 1 of 1 | R-05 |
 | NFR-02 | Must | Ledger rows (charges, payments, allocations, deductions) are never… | US-15 | TC-PAY-10, TC-PAY-11 | 2 of 2 | R-06 |
 | NFR-03 | Must | Every table has RLS enabled; an automated test proves user B cannot… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
@@ -47,7 +47,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 
 | Story | Title | Sprint | Built in |
 | --- | --- | --- | --- |
-| US-01 | Sign up and sign in | S1 | `src/app/(app)/page.tsx:14`<br>`src/app/auth/actions.ts:2`<br>`src/lib/auth.ts:1`<br>`src/lib/supabase/middleware.ts:6` |
+| US-01 | Sign up and sign in | S1 | `src/app/(app)/page.tsx:63`<br>`src/app/auth/actions.ts:2`<br>`src/lib/auth.ts:1`<br>`src/lib/supabase/middleware.ts:6` |
 | US-02 | My data stays mine | S1 | `supabase/migrations/20261017100000_base.sql:5`<br>`supabase/migrations/20261017100100_properties_units.sql:1`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
 | US-03 | Properties and units | S1 | `src/app/(app)/properties/[id]/page.tsx:9`<br>`src/app/(app)/properties/actions.ts:2`<br>`src/app/(app)/properties/page.tsx:11`<br>`supabase/migrations/20261017100100_properties_units.sql:1`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-04 | Tenants | S1 | `src/app/(app)/tenants/[id]/page.tsx:6`<br>`src/app/(app)/tenants/actions.ts:2`<br>`src/app/(app)/tenants/page.tsx:8`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
@@ -56,7 +56,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-07 | Change rent mid-lease | S3 | `src/app/(app)/leases/[id]/rent-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:194`<br>`supabase/migrations/20261018160000_rent_change.sql:1` |
 | US-08 | Renew a lease | S3 | `src/app/(app)/leases/[id]/renew-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:212`<br>`supabase/migrations/20261018170000_renewal.sql:1` |
 | US-09 | Early move-out | S2 | `src/app/(app)/leases/[id]/move-out-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:151`<br>`supabase/migrations/20261018100000_charges.sql:67`<br>`supabase/migrations/20261018110000_payments_ledger.sql:65`<br>`supabase/migrations/20261018130000_move_out.sql:1` |
-| US-10 | Generate monthly charges | S2 | `src/app/(app)/charges/actions.ts:2`<br>`src/app/(app)/charges/page.tsx:19`<br>`src/lib/charges.ts:1`<br>`supabase/migrations/20261018100000_charges.sql:1` |
+| US-10 | Generate monthly charges | S2 | `src/app/(app)/charges/actions.ts:2`<br>`src/app/(app)/charges/page.tsx:19`<br>`src/app/(app)/dashboard-generate.tsx:2`<br>`src/lib/charges.ts:1`<br>`supabase/migrations/20261018100000_charges.sql:1` |
 | US-11 | Prorate the first month | S2 | `src/app/(app)/charges/page.tsx:19`<br>`supabase/migrations/20261018100000_charges.sql:1` |
 | US-12 | Record a payment | S2 | `src/app/(app)/leases/[id]/payment-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:89`<br>`supabase/migrations/20261018110000_payments_ledger.sql:1` |
 | US-13 | Partial payments | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`src/app/(app)/leases/[id]/payment-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:89`<br>`supabase/migrations/20261018110000_payments_ledger.sql:1` |
@@ -69,7 +69,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-20 | Overdue rent | S3 | `src/app/(app)/reports/overdue/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
 | US-21 | Pending refunds | S3 | `src/app/(app)/reports/refunds/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
 | US-22 | CSV export | S3 | `src/app/(app)/leases/[id]/ledger-rows.ts:1`<br>`src/app/(app)/leases/[id]/ledger.csv/route.ts:1`<br>`src/app/(app)/reports/overdue.csv/route.ts:1`<br>`src/app/(app)/reports/refunds.csv/route.ts:1`<br>`src/lib/csv.ts:1` |
-| US-23 | Dashboard | S3 | `src/app/(app)/page.tsx:14` |
+| US-23 | Dashboard | S3 | `src/app/(app)/dashboard-generate.tsx:2`<br>`src/app/(app)/page.tsx:26`<br>`supabase/migrations/20261018180000_dashboard.sql:1` |
 
 ## UAT case → automated test
 
@@ -191,6 +191,8 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease isn't listed | `tests/db/reports.test.ts:97` |
 | TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease no longer appears | `e2e/reports.spec.ts:56` |
 | TC-RPT-06 | US-22 | TC-RPT-06 Given a lease ledger, when I click Export CSV, then I get a file with the same rows and columns as the page, amounts as decimals | `e2e/csv.spec.ts:15` |
+| TC-RPT-07 | US-23 | TC-RPT-07 Given two leases and a spare unit, when I open the dashboard on 2026-12-11, then it shows units occupied, rent due this month, total overdue and deposits held | `tests/db/dashboard.test.ts:34` |
+| TC-RPT-07 | US-23 | TC-RPT-07 Given an account with an active lease, when I open the dashboard, then four totals are shown and each opens its detail page | `e2e/dashboard.spec.ts:17` |
 | TC-NFR-01 | US-02 | TC-NFR-01 Given landlords A and B each have a property, when B lists properties, then B sees only B's property | `tests/db/rls.test.ts:41` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease through the API, then no row is returned | `tests/api/isolation.test.ts:45` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease directly, then no row is returned | `tests/db/rls.test.ts:62` |
@@ -201,7 +203,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-05 | NFR-06 | TC-NFR-05 Given a seeded lease, when I generate charges, record a payment and open Overdue using only the keyboard, then every step works and focus is always visible | `e2e/reports.spec.ts:66` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (4): TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (3): TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -222,5 +224,5 @@ UAT cases with no automated test yet (4): TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NF
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 66 of 70
+- UAT cases with an automated test: 67 of 70
 - Link errors: 0
