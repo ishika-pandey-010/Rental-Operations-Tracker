@@ -77,4 +77,4 @@ select …  -- every active lease covering :period
 on conflict (lease_id, period) where kind = 'rent' do nothing;
 ```
 
-Running it twice, or twice at the same moment, creates each charge once (US-10 AC2, AC3).
+Running it twice, or twice at the same moment, creates each charge once (US-10 AC2, AC3). The amount comes from `prorate_cents(rent, occupied_days, days_in_month)`, the only proration code in the system, and the description of a prorated charge says how many days it covers.

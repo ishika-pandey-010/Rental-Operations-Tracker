@@ -61,6 +61,15 @@ Left out of S1 on purpose: editing a lease after it's created (not in any story;
 | US-15 Reverse a bounced payment | 3 | Should — first to cut |
 | US-16 Lease ledger | 3 | `lease_ledger` view |
 
+**S2 build plan (written 2026-10-18, before any S2 code).** Four branches, in this order, because each needs the one before:
+
+1. `feature/US-10-11-charges`: `charges` and `charge_adjustments` (append-only), one proration function (D-04, R-05), `generate_rent_charges(period)` with the partial unique index and `ON CONFLICT DO NOTHING` (D-06), and a Charges page that generates a month and lists it.
+2. `feature/US-12-13-14-16-payments-and-ledger`: `payments` and `payment_allocations`, the allocation cap trigger (R-02), oldest-first default allocation, credit and its auto-apply when a charge is created (D-07), the `charge_balances`, `lease_credit` and `lease_ledger` views, and the payment form and ledger on the lease page. The ledger is in this branch because a payment form with nowhere to see the result can't be reviewed as a user.
+3. `feature/US-15-reversals`: `payment_reversals`; a reversal releases the payment's allocations with negative allocation rows.
+4. `feature/US-09-move-out`: `move_out(lease, date)` sets the date, ends the lease, adds a proration adjustment to an already-charged final month (releasing any allocation above the new amount to credit first), and cancels later charges.
+
+Every money operation on a lease takes a per-lease advisory lock before it reads balances, so two requests at once can't both pass the allocation cap (D-26).
+
 ## S3 — Deposits, reports, UAT
 
 | Story | Points | Notes |
@@ -107,6 +116,7 @@ Filled in at the end of each sprint. Planned vs done points come from the Jira s
 - Risks changed: R-03 and R-04 now have passing automated proving tests (TC-LEASE-04, TC-LEASE-07, TC-NFR-01 to 04); they stay open until UAT runs them on the hosted demo. R-15 added.
 - Retro, keep: writing the database tests first caught nothing this time, because the migrations were written against them, but they made the trigger wording and the AC wording identical, which the UI then shows unchanged.
 - Retro, change: two end-to-end failures in S1 were my tests racing the page (typing before navigation finished). Every helper now waits for the page heading before typing.
+- Retro, change: CI's docs job failed on two merges because I regenerated `traceability.md` while test files held back for a later branch were sitting untracked in the working tree, so the committed matrix listed tests that weren't in the commit. The fix is procedural: regenerate only from a tree where every test file is committed or removed.
 
 ### S2 review
 - Planned: 29 pts · Done: [TBD]
