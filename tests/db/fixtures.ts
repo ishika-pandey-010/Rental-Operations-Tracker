@@ -73,3 +73,17 @@ export async function activeLease(db: Db, overrides: Partial<LeaseInput> & { uni
 export async function leaseStatus(db: Db, leaseId: string) {
   return (await db.one<{ status: string }>("select status from leases where id = $1", [leaseId])).status;
 }
+
+export async function generate(db: Db, period: string) {
+  return db.one<{ created: number; existing: number }>(
+    "select created, existing from generate_rent_charges($1)",
+    [period],
+  );
+}
+
+export async function rentCharges(db: Db, leaseId: string) {
+  return db.many<{ id: string; period: string; amount_cents: number; due_date: string }>(
+    "select id, period, amount_cents, due_date from charges where lease_id = $1 and kind = 'rent' order by period",
+    [leaseId],
+  );
+}
