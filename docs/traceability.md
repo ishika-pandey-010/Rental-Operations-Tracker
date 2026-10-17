@@ -25,7 +25,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-15 | Must | Record deposit deductions with an amount and a reason. | US-18 | TC-DEP-03, TC-DEP-04 | 2 of 2 | — |
 | FR-16 | Must | Calculate the refund as deposit − deductions and track its status (… | US-19 | TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08 | 4 of 4 | R-07 |
 | FR-17 | Must | Record an early move-out: set the move-out date, prorate the final… | US-09 | TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 3 of 3 | R-05 |
-| FR-18 | Should | Renew a lease as a new lease linked to the old one; the deposit can… | US-08 | TC-LEASE-10, TC-LEASE-11 | 0 of 2 | — |
+| FR-18 | Should | Renew a lease as a new lease linked to the old one; the deposit can… | US-08 | TC-LEASE-10, TC-LEASE-11 | 2 of 2 | — |
 | FR-19 | Must | Overdue rent report: every charge past due with a balance, and days… | US-20 | TC-RPT-01, TC-RPT-02, TC-RPT-03 | 3 of 3 | — |
 | FR-20 | Must | Pending refunds report: every ended lease whose refund is not paid. | US-21 | TC-RPT-04, TC-RPT-05 | 2 of 2 | — |
 | FR-21 | Must | Lease ledger view: charges, payments, allocations and running balan… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
@@ -51,10 +51,10 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-02 | My data stays mine | S1 | `supabase/migrations/20261017100000_base.sql:5`<br>`supabase/migrations/20261017100100_properties_units.sql:1`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
 | US-03 | Properties and units | S1 | `src/app/(app)/properties/[id]/page.tsx:9`<br>`src/app/(app)/properties/actions.ts:2`<br>`src/app/(app)/properties/page.tsx:11`<br>`supabase/migrations/20261017100100_properties_units.sql:1`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-04 | Tenants | S1 | `src/app/(app)/tenants/[id]/page.tsx:6`<br>`src/app/(app)/tenants/actions.ts:2`<br>`src/app/(app)/tenants/page.tsx:8`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
-| US-05 | Create a lease | S1 | `src/app/(app)/leases/[id]/page.tsx:17`<br>`src/app/(app)/leases/actions.ts:2`<br>`src/app/(app)/leases/new/page.tsx:10`<br>`src/app/(app)/leases/page.tsx:11`<br>`supabase/migrations/20261017100300_leases_deposits.sql:1` |
-| US-06 | No active lease without a deposit decision | S1 | `src/app/(app)/leases/[id]/page.tsx:17`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:1` |
+| US-05 | Create a lease | S1 | `src/app/(app)/leases/[id]/page.tsx:18`<br>`src/app/(app)/leases/actions.ts:2`<br>`src/app/(app)/leases/new/page.tsx:10`<br>`src/app/(app)/leases/page.tsx:11`<br>`supabase/migrations/20261017100300_leases_deposits.sql:1` |
+| US-06 | No active lease without a deposit decision | S1 | `src/app/(app)/leases/[id]/page.tsx:18`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:1` |
 | US-07 | Change rent mid-lease | S3 | `src/app/(app)/leases/[id]/rent-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:194`<br>`supabase/migrations/20261018160000_rent_change.sql:1` |
-| US-08 | Renew a lease | S3 | — |
+| US-08 | Renew a lease | S3 | `src/app/(app)/leases/[id]/renew-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:212`<br>`supabase/migrations/20261018170000_renewal.sql:1` |
 | US-09 | Early move-out | S2 | `src/app/(app)/leases/[id]/move-out-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:151`<br>`supabase/migrations/20261018100000_charges.sql:67`<br>`supabase/migrations/20261018110000_payments_ledger.sql:65`<br>`supabase/migrations/20261018130000_move_out.sql:1` |
 | US-10 | Generate monthly charges | S2 | `src/app/(app)/charges/actions.ts:2`<br>`src/app/(app)/charges/page.tsx:19`<br>`src/lib/charges.ts:1`<br>`supabase/migrations/20261018100000_charges.sql:1` |
 | US-11 | Prorate the first month | S2 | `src/app/(app)/charges/page.tsx:19`<br>`supabase/migrations/20261018100000_charges.sql:1` |
@@ -63,7 +63,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-14 | Overpayment becomes credit | S2 | `supabase/migrations/20261018110000_payments_ledger.sql:2` |
 | US-15 | Reverse a bounced payment | S2 | `src/app/(app)/leases/[id]/reverse-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:135`<br>`supabase/migrations/20261018110000_payments_ledger.sql:76`<br>`supabase/migrations/20261018120000_payment_reversals.sql:1` |
 | US-16 | Lease ledger | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`supabase/migrations/20261018110000_payments_ledger.sql:2`<br>`supabase/migrations/20261018120000_payment_reversals.sql:145` |
-| US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:17`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
+| US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:18`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-18 | Deposit deductions | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:163`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
 | US-19 | Refund or amount owed | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:178`<br>`supabase/migrations/20261018100000_charges.sql:4`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
 | US-20 | Overdue rent | S3 | `src/app/(app)/reports/overdue/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
@@ -118,6 +118,10 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-LEASE-08 | US-07 | TC-LEASE-08 Given Nov and Dec are charged at 1,200.00, when I set 1,250.00 from 2027-01 and generate January, then January is 1,250.00 and Nov and Dec stay 1,200.00 | `e2e/rent-change.spec.ts:9` |
 | TC-LEASE-09 | US-07 | TC-LEASE-09 Given January is already charged, when I set a rent change from 2027-01, then I see 'January is already charged; choose a later month' and nothing changes | `tests/db/rent-change.test.ts:34` |
 | TC-LEASE-09 | US-07 | TC-LEASE-09 Given January is already charged, when I set new rent from 2027-01, then I see 'January is already charged; choose a later month' and nothing changes | `e2e/rent-change.spec.ts:27` |
+| TC-LEASE-10 | US-08 | TC-LEASE-10 Given an active lease ending 2027-10-31, when I renew it from 2027-11-01 to 2028-10-31, then a new lease is linked to the old one and the old one ends on 2027-10-31 | `tests/db/renewal.test.ts:18` |
+| TC-LEASE-10 | US-08 | TC-LEASE-10 Given an active lease ending 2027-10-31, when I renew it from 2027-11-01 to 2028-10-31, then a new lease links to the old one and the old one ends on 2027-10-31 | `e2e/renewal.spec.ts:15` |
+| TC-LEASE-11 | US-08 | TC-LEASE-11 Given the old lease holds a 1,200.00 deposit, when I renew with the deposit carried over, then the new lease shows it, is active, and no refund is pending on the old lease | `tests/db/renewal.test.ts:29` |
+| TC-LEASE-11 | US-08 | TC-LEASE-11 Given the old lease holds a 1,200.00 deposit, when I renew with the deposit carried over, then the new lease shows it and no refund is pending for the old lease | `e2e/renewal.spec.ts:32` |
 | TC-LEASE-12 | US-09 | TC-LEASE-12 Given February isn't charged yet, when I record a move-out on 2027-02-10 and generate February, then the charge is 428.57 and the lease is ended | `tests/db/moveout.test.ts:24` |
 | TC-LEASE-12 | US-09 | TC-LEASE-12 and TC-LEASE-14 Given a move-out on 2027-02-10 before February is charged, when I generate February and March, then February is 428.57 and March creates nothing | `e2e/moveout.spec.ts:27` |
 | TC-LEASE-13 | US-09 | TC-LEASE-13 Given February was charged 1,200.00, when I record the move-out, then a -771.43 adjustment is added and the original charge stays as it was | `tests/db/moveout.test.ts:33` |
@@ -196,7 +200,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-05 | NFR-06 | TC-NFR-05 Given a seeded lease, when I generate charges, record a payment and open Overdue using only the keyboard, then every step works and focus is always visible | `e2e/reports.spec.ts:66` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (7): TC-LEASE-10, TC-LEASE-11, TC-RPT-06, TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (5): TC-RPT-06, TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -217,5 +221,5 @@ UAT cases with no automated test yet (7): TC-LEASE-10, TC-LEASE-11, TC-RPT-06, T
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 63 of 70
+- UAT cases with an automated test: 65 of 70
 - Link errors: 0

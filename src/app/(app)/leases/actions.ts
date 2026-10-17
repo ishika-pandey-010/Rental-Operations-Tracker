@@ -208,3 +208,32 @@ export async function changeRent(_prev: FormState, formData: FormData): Promise<
   done(values.lease_id, `Rent is ${formatMoney(amount.cents)} a month from ${monthName(values.from_month)}`);
   return {};
 }
+
+// US-08 Renew a lease
+export async function renewLease(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "start_date", "end_date", "rent", "carry"]);
+  const amount = positiveAmount(values.rent, "monthly rent");
+  if ("error" in amount) return fail(amount.error, values);
+  const carry = values.carry === "on";
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("renew_lease", {
+    p_lease_id: values.lease_id,
+    p_start: values.start_date,
+    p_end: values.end_date,
+    p_monthly_rent_cents: amount.cents,
+    p_carry_deposit: carry,
+  });
+  if (error) return fail(dbErrorMessage(error), values);
+  const newId = data as string;
+  const { data: held } = await supabase.from("lease_deposit_summary").select("held_cents").eq("lease_id", newId).single();
+  revalidatePath("/leases");
+  revalidatePath(`/leases/${values.lease_id}`);
+  const span = `Renewed from ${values.start_date} to ${values.end_date}.`;
+  done(
+    newId,
+    held && held.held_cents > 0
+      ? `${span} The ${formatMoney(held.held_cents)} deposit carried over and the lease is active.`
+      : `${span} Record a deposit or a waiver, then activate it.`,
+  );
+  return {};
+}
