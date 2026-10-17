@@ -30,6 +30,11 @@ export default async function OverduePage({ searchParams }: { searchParams: Prom
     <>
       <div className="page-head">
         <h1>Overdue rent</h1>
+        {rows.length > 0 && (
+          <a className="button secondary" href={`/reports/overdue.csv?as_of=${asOf}`}>
+            Export CSV
+          </a>
+        )}
       </div>
       <p className="muted">Charges past their due date with money still owed. A charge counts as overdue from the day after it&apos;s due.</p>
       <AsOfForm asOf={asOf} action="/reports/overdue" />

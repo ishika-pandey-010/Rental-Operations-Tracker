@@ -29,7 +29,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-19 | Must | Overdue rent report: every charge past due with a balance, and days… | US-20 | TC-RPT-01, TC-RPT-02, TC-RPT-03 | 3 of 3 | — |
 | FR-20 | Must | Pending refunds report: every ended lease whose refund is not paid. | US-21 | TC-RPT-04, TC-RPT-05 | 2 of 2 | — |
 | FR-21 | Must | Lease ledger view: charges, payments, allocations and running balan… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
-| FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 0 of 1 | — |
+| FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 1 of 1 | — |
 | FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 0 of 1 | — |
 | NFR-01 | Must | Money is stored as integer minor units. No floating-point arithmeti… | — | TC-NFR-08 | 1 of 1 | R-05 |
 | NFR-02 | Must | Ledger rows (charges, payments, allocations, deductions) are never… | US-15 | TC-PAY-10, TC-PAY-11 | 2 of 2 | R-06 |
@@ -62,13 +62,13 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-13 | Partial payments | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`src/app/(app)/leases/[id]/payment-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:89`<br>`supabase/migrations/20261018110000_payments_ledger.sql:1` |
 | US-14 | Overpayment becomes credit | S2 | `supabase/migrations/20261018110000_payments_ledger.sql:2` |
 | US-15 | Reverse a bounced payment | S2 | `src/app/(app)/leases/[id]/reverse-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:135`<br>`supabase/migrations/20261018110000_payments_ledger.sql:76`<br>`supabase/migrations/20261018120000_payment_reversals.sql:1` |
-| US-16 | Lease ledger | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`supabase/migrations/20261018110000_payments_ledger.sql:2`<br>`supabase/migrations/20261018120000_payment_reversals.sql:145` |
+| US-16 | Lease ledger | S2 | `src/app/(app)/leases/[id]/ledger-rows.ts:1`<br>`src/app/(app)/leases/[id]/money.tsx:1`<br>`supabase/migrations/20261018110000_payments_ledger.sql:2`<br>`supabase/migrations/20261018120000_payment_reversals.sql:145` |
 | US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:18`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-18 | Deposit deductions | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:163`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
 | US-19 | Refund or amount owed | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:178`<br>`supabase/migrations/20261018100000_charges.sql:4`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
 | US-20 | Overdue rent | S3 | `src/app/(app)/reports/overdue/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
 | US-21 | Pending refunds | S3 | `src/app/(app)/reports/refunds/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
-| US-22 | CSV export | S3 | — |
+| US-22 | CSV export | S3 | `src/app/(app)/leases/[id]/ledger-rows.ts:1`<br>`src/app/(app)/leases/[id]/ledger.csv/route.ts:1`<br>`src/app/(app)/reports/overdue.csv/route.ts:1`<br>`src/app/(app)/reports/refunds.csv/route.ts:1`<br>`src/lib/csv.ts:1` |
 | US-23 | Dashboard | S3 | `src/app/(app)/page.tsx:14` |
 
 ## UAT case → automated test
@@ -190,6 +190,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-RPT-04 | US-21 | TC-RPT-04 Given a lease ended 2027-02-10 with a pending refund, when I open Pending refunds, then it's listed with the amount and days since end | `e2e/reports.spec.ts:45` |
 | TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease isn't listed | `tests/db/reports.test.ts:97` |
 | TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease no longer appears | `e2e/reports.spec.ts:56` |
+| TC-RPT-06 | US-22 | TC-RPT-06 Given a lease ledger, when I click Export CSV, then I get a file with the same rows and columns as the page, amounts as decimals | `e2e/csv.spec.ts:15` |
 | TC-NFR-01 | US-02 | TC-NFR-01 Given landlords A and B each have a property, when B lists properties, then B sees only B's property | `tests/db/rls.test.ts:41` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease through the API, then no row is returned | `tests/api/isolation.test.ts:45` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease directly, then no row is returned | `tests/db/rls.test.ts:62` |
@@ -200,7 +201,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-05 | NFR-06 | TC-NFR-05 Given a seeded lease, when I generate charges, record a payment and open Overdue using only the keyboard, then every step works and focus is always visible | `e2e/reports.spec.ts:66` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (5): TC-RPT-06, TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (4): TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -221,5 +222,5 @@ UAT cases with no automated test yet (5): TC-RPT-06, TC-RPT-07, TC-NFR-06, TC-NF
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 65 of 70
+- UAT cases with an automated test: 66 of 70
 - Link errors: 0

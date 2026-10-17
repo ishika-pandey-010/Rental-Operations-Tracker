@@ -1,7 +1,8 @@
 // US-13, US-16: the charges table and the lease ledger (server components).
-import { formatMoney } from "@/lib/money";
+import { CURRENCY, formatMoney } from "@/lib/money";
 import { formatTimestamp } from "@/lib/dates";
 import { ReverseForm } from "./reverse-form";
+import { ledgerLines } from "./ledger-rows";
 
 export type ChargeBalance = {
   charge_id: string;
@@ -79,6 +80,7 @@ export function LedgerTable({
   reversed: Set<string>;
   today: string;
 }) {
+  const lines = ledgerLines(rows, reversed, CURRENCY);
   if (rows.length === 0)
     return <p className="muted">Nothing charged or paid yet. Charges, payments and where each payment went will appear here in date order.</p>;
   return (
@@ -93,19 +95,18 @@ export function LedgerTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) =>
-            r.entry_type === "allocation" ? (
+          {rows.map((r, i) => {
+            const line = lines[i];
+            return line.sub ? (
               <tr key={r.ref_id} className="sub">
                 <td />
-                <td style={{ paddingLeft: "1.5rem" }}>
-                  ↳ {r.description}: {formatMoney(r.allocation_cents)}
-                </td>
+                <td style={{ paddingLeft: "1.5rem" }}>↳ {line.entry}</td>
                 <td />
                 <td />
               </tr>
             ) : (
               <tr key={r.ref_id}>
-                <td>{r.entry_date}</td>
+                <td>{line.date}</td>
                 <td>
                   {r.description}
                   {r.entry_type === "payment" && reversed.has(r.ref_id) && (
@@ -123,13 +124,13 @@ export function LedgerTable({
                     <ReverseForm leaseId={leaseId} paymentId={r.ref_id} today={today} />
                   )}
                 </td>
-                <td className="num">{formatMoney(r.amount_cents)}</td>
+                <td className="num">{line.amount}</td>
                 <td className="num" data-testid="running-balance">
-                  {formatMoney(r.balance_cents)}
+                  {line.balance}
                 </td>
               </tr>
-            ),
-          )}
+            );
+          })}
         </tbody>
       </table>
     </div>
