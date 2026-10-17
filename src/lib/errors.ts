@@ -12,6 +12,13 @@ export const CONSTRAINT_MESSAGES: Record<string, string> = {
   units_property_id_label_key: "Unit label already used in this property",
   tenants_name_not_blank: "Add the tenant's name",
   tenants_contact_required: "Add a phone number or email",
+  leases_end_after_start: "End date must be after start date",
+  leases_due_day_range: "Due day must be between 1 and 28",
+  leases_one_active_per_unit: "This unit already has an active lease for these dates",
+  leases_waiver_complete: "Give the waiver a date and a reason",
+  leases_move_out_in_term: "The move-out date must fall between the lease's start and end dates",
+  lease_rent_schedule_rent_positive: "Rent must be more than zero",
+  deposits_amount_positive: "Amount must be more than zero",
 };
 
 type DbErrorLike = { code?: string; message?: string; details?: string | null; hint?: string | null };

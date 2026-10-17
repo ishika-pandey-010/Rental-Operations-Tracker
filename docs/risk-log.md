@@ -8,8 +8,8 @@ Reviewed at every sprint review. **Likelihood** and **Impact** are 1 (low) to 3 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | R-01 | The same month's rent is charged twice (retry, double click, concurrent job) | 3 | 3 | 9 | Partial unique index on `(lease_id, period)` + `ON CONFLICT DO NOTHING` (D-06) | TC-CHG-02, TC-CHG-03 | Open |
 | R-02 | A charge is allocated more money than it's worth, hiding an overpayment | 2 | 3 | 6 | Allocation trigger caps net allocations per charge and per payment | TC-PAY-07 | Open |
-| R-03 | A lease goes active with no deposit recorded | 3 | 2 | 6 | Activation trigger requires a deposit row or a dated waiver (FR-06) | TC-LEASE-04, TC-LEASE-07 | Open |
-| R-04 | One landlord sees or edits another's data | 1 | 3 | 3 | RLS on every table; cross-account tests in CI (NFR-03) | TC-NFR-01 – TC-NFR-04 | Open |
+| R-03 | A lease goes active with no deposit recorded | 3 | 2 | 6 | Activation trigger requires a deposit row or a dated waiver (FR-06) | TC-LEASE-04, TC-LEASE-07 | Open: automated tests pass, UAT not run |
+| R-04 | One landlord sees or edits another's data | 1 | 3 | 3 | RLS on every table; cross-account tests in CI (NFR-03) | TC-NFR-01 – TC-NFR-04 | Open: automated tests pass, UAT not run |
 | R-05 | Rounding drift makes balances off by a cent | 2 | 2 | 4 | Integer cents (D-02); one proration function, half-up, unit-tested | TC-NFR-08, TC-CHG-05, TC-LEASE-12 | Open |
 | R-06 | A wrong entry is fixed by editing history, so the ledger can't be audited | 2 | 3 | 6 | Append-only tables; reversal and adjustment rows (D-03) | TC-PAY-11 | Open |
 | R-07 | Deductions exceed the deposit and the refund goes negative | 2 | 2 | 4 | Refund = max(0, …); excess becomes a charge (D-09) | TC-DEP-06, TC-DEP-07 | Open |

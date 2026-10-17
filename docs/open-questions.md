@@ -24,3 +24,4 @@ Anything vague, missing or contradictory in the docs, with where it came from. A
 | OQ-18 | discovery-notes.md, user-test.md | Discovery conversations and the timed user test need real people. | Open, needs owner | Not run. Every `[TBD]` stays a placeholder (CLAUDE.md rule 6). |
 | OQ-19 | US-20, US-21 | "Today" depends on a timezone. Postgres `current_date` is UTC on Supabase. | Assumption | Reports take an `as_of` date. The app passes today's date in `APP_TIMEZONE` (default UTC). |
 | OQ-20 | US-16 | Which sign does the running balance use? | Assumption | Positive means the tenant owes money; negative means they're in credit. Charges add, payments subtract. |
+| OQ-21 | US-05, FR-05 | A draft lease saved by mistake can't be edited or deleted. Should drafts be deletable? | Open | Not built. A wrong draft stays in the list as a draft and never gets charged. Deleting would need a delete policy limited to drafts with no deposit rows. |

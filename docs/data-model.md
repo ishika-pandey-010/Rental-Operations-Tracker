@@ -50,6 +50,7 @@ Nothing below is stored. Each is a SQL view so the numbers can't drift from the 
 
 | View | Returns | Used by |
 | --- | --- | --- |
+| `lease_deposit_summary` | per lease: deposits received, deposit held | Lease page (US-17) |
 | `charge_balances` | per charge: amount + adjustments, allocated, balance, status (`open`, `partial`, `paid`) | Ledger, reports |
 | `lease_credit` | per lease: payments not reversed − net allocations | Ledger, credit auto-apply |
 | `lease_ledger` | charges, adjustments, payments, reversals in date order with running balance | US-16 |
