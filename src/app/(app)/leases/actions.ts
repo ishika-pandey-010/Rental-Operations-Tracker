@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NOT_FOUND, dbErrorMessage } from "@/lib/errors";
 import { fail, pick, succeed, type FormState } from "@/lib/form-state";
 import { formatMoney, parseMoney, positiveAmount } from "@/lib/money";
+import { monthName } from "@/lib/dates";
 
 const done = (id: string, message: string) => redirect(`/leases/${id}?done=${encodeURIComponent(message)}`);
 
@@ -187,5 +188,23 @@ export async function payRefund(_prev: FormState, formData: FormData): Promise<F
   revalidatePath(`/leases/${values.lease_id}`);
   revalidatePath("/reports/refunds");
   done(values.lease_id, `Refund of ${formatMoney(values.amount_cents)} marked paid`);
+  return {};
+}
+
+// US-07 Change rent mid-lease
+export async function changeRent(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "rent", "from_month"]);
+  const amount = positiveAmount(values.rent, "new rent");
+  if ("error" in amount) return fail(amount.error, values);
+  if (!/^\d{4}-\d{2}$/.test(values.from_month)) return fail("Choose the month the new rent starts", values);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("change_rent", {
+    p_lease_id: values.lease_id,
+    p_from: `${values.from_month}-01`,
+    p_monthly_rent_cents: amount.cents,
+  });
+  if (error) return fail(dbErrorMessage(error), values);
+  revalidatePath(`/leases/${values.lease_id}`);
+  done(values.lease_id, `Rent is ${formatMoney(amount.cents)} a month from ${monthName(values.from_month)}`);
   return {};
 }

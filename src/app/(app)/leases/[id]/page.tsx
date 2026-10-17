@@ -3,13 +3,14 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Flash } from "@/components/form";
 import { formatMoney, centsToInput } from "@/lib/money";
-import { monthName, todayISO } from "@/lib/dates";
+import { firstOfNextMonth, monthName, todayISO } from "@/lib/dates";
 import { getLease, unitName } from "../data";
 import { ActivateButton, DepositForm, WaiverForm } from "../forms";
 import { ChargesTable, LedgerTable, type ChargeBalance, type LedgerRow } from "./money";
 import { PaymentForm } from "./payment-form";
 import { MoveOutForm } from "./move-out-form";
 import { DeductionForm, RefundForm } from "./settlement";
+import { RentChangeForm } from "./rent-form";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -33,7 +34,7 @@ export default async function LeasePage({
       supabase.from("lease_deposit_summary").select("received_cents, held_cents").eq("lease_id", id).single(),
       supabase
         .from("charge_balances")
-        .select("charge_id, description, due_date, value_cents, allocated_cents, balance_cents, status")
+        .select("charge_id, kind, period, description, due_date, value_cents, allocated_cents, balance_cents, status")
         .eq("lease_id", id)
         .order("due_date"),
       supabase.from("lease_credit").select("credit_cents").eq("lease_id", id).single(),
@@ -144,6 +145,17 @@ export default async function LeasePage({
             </li>
           ))}
         </ul>
+        {lease.status !== "ended" && (
+          <RentChangeForm
+            leaseId={lease.id}
+            fromMonth={(() => {
+              // Smart default: the month after the latest rent charge, or the lease's first month.
+              const charged = charges.filter((c) => c.kind === "rent" && c.period).map((c) => c.period as string).sort();
+              const last = charged[charged.length - 1];
+              return (last ? firstOfNextMonth(last) : lease.start_date).slice(0, 7);
+            })()}
+          />
+        )}
         {lease.tenant.phone || lease.tenant.email ? (
           <p className="muted">
             Tenant: <Link href={`/tenants/${lease.tenant.id}`}>{lease.tenant.full_name}</Link>
