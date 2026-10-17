@@ -57,6 +57,7 @@ Nothing below is stored. Each is a SQL view so the numbers can't drift from the 
 | `lease_ledger` | charges, adjustments, payments, reversals in date order with a running balance (positive = tenant owes). Allocation rows show where each payment went ("Applied to…", "Credit applied to…") and don't move the balance | US-16 |
 | `overdue_rent(as_of)` | function: charges with balance > 0 and due date before `as_of`, with days overdue (overdue from the day after the due date, OQ-05) | US-20 |
 | `lease_refund_status` | per lease: held, deductions, refund due, amount owed above the deposit, status (`not_due`, `pending`, `nothing_held`, `paid`), paid on | Lease page, US-21 |
+| `dashboard_totals(as_of)` | function: units (active, in active properties), units occupied on the date, rent charged for the month and how much is unpaid, total overdue, deposits held (every lease whose refund isn't paid) | US-23 |
 | `pending_refunds(as_of)` | function: ended leases whose refund status is `pending` (a deposit held, no refund row), with refund due and days since the move-out | US-21 |
 
 ## Money rules, worked
