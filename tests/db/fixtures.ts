@@ -135,3 +135,21 @@ export async function reversePayment(db: Db, paymentId: string, reason = "bounce
 export async function moveOut(db: Db, leaseId: string, on: string) {
   await db.query("select move_out($1, $2)", [leaseId, on]);
 }
+
+export async function addDeduction(db: Db, leaseId: string, cents: number, reason = "carpet cleaning") {
+  await db.query("insert into deposit_deductions (lease_id, amount_cents, reason) values ($1, $2, $3)", [leaseId, cents, reason]);
+}
+
+export async function refundStatus(db: Db, leaseId: string) {
+  return db.one<{ held_cents: number; deductions_cents: number; refund_due_cents: number; owed_cents: number; status: string; paid_on: string | null }>(
+    "select held_cents, deductions_cents, refund_due_cents, owed_cents, status, paid_on from lease_refund_status where lease_id = $1",
+    [leaseId],
+  );
+}
+
+/** An active lease with a 1,200.00 deposit that moved out on 2027-02-10. */
+export async function endedLease(db: Db) {
+  const lease = await activeLease(db);
+  await moveOut(db, lease.leaseId, "2027-02-10");
+  return lease;
+}
