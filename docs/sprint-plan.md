@@ -99,10 +99,14 @@ Filled in at the end of each sprint. Planned vs done points come from the Jira s
 - Retro — keep: [TBD] · change: [TBD]
 
 ### S1 review
-- Planned: 18 pts · Done: [TBD]
-- Demo: [TBD]
-- Carried over: [TBD]
-- Retro — keep: [TBD] · change: [TBD]
+- Planned: 18 pts · Done: 18 pts (US-01 to US-06, US-17). There's no Jira sprint report (OQ-17); the count comes from the feature map.
+- Dates: built 2026-10-17 to 2026-10-18, before the planned 2026-10-19 start, in one Claude Code session on the owner's instruction (D-15, D-16). The 12 hours a week capacity assumption doesn't describe this build, so S2 and S3 are not re-planned around a velocity number.
+- Demo, as run in the end-to-end suite: sign up; add "12 Elm St" with units A and B in one form; add a tenant; create a lease; try to activate it and get "Record a deposit or a waiver first"; record a 1,200.00 deposit with "Record and activate"; try to archive unit A and get "Unit has an active lease".
+- Tests at the end of S1: 90 Vitest (unit, database, API) and 37 Playwright, all passing locally. UAT cases automated: see [traceability.md](traceability.md#coverage). No UAT case has been executed by a person; every row in the UAT sheet is still `Not run`.
+- Carried over: nothing in scope. Added to the open questions: OQ-21 (deleting a draft lease).
+- Risks changed: R-03 and R-04 now have passing automated proving tests (TC-LEASE-04, TC-LEASE-07, TC-NFR-01 to 04); they stay open until UAT runs them on the hosted demo. R-15 added.
+- Retro, keep: writing the database tests first caught nothing this time, because the migrations were written against them, but they made the trigger wording and the AC wording identical, which the UI then shows unchanged.
+- Retro, change: two end-to-end failures in S1 were my tests racing the page (typing before navigation finished). Every helper now waits for the page heading before typing.
 
 ### S2 review
 - Planned: 29 pts · Done: [TBD]

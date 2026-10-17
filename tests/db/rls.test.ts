@@ -59,6 +59,20 @@ describe("US-02 My data stays mine", () => {
     expect(["23503", "42501"]).toContain(err.code);
   });
 
+  it("TC-NFR-02 Given A's lease ID, when B requests that lease directly, then no row is returned", async () => {
+    await db.asUser(landlordB);
+    expect(await db.many("select * from leases where id = $1", [a.leaseId])).toEqual([]);
+  });
+
+  it("TC-NFR-03 Given A's lease ID, when B tries to record a deposit against it, then the insert is rejected", async () => {
+    await db.asUser(landlordB);
+    const err = await expectDbError(() =>
+      db.query("insert into deposits (lease_id, amount_cents, received_on) values ($1, 100, '2026-10-01')", [a.leaseId]),
+    );
+    // Either the composite foreign key or the RLS check refuses it; both stop B.
+    expect(["23503", "42501"]).toContain(err.code);
+  });
+
   it("Given B claims to be A by setting owner_id, when B inserts a property, then RLS rejects it", async () => {
     await db.asUser(landlordB);
     const err = await expectDbError(() =>
