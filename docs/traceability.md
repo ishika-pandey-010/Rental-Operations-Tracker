@@ -9,11 +9,11 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | Req | Priority | Requirement | Stories | UAT cases | Automated | Risks |
 | --- | --- | --- | --- | --- | --- | --- |
 | FR-01 | Must | A landlord can sign up, sign in and sign out with email (Supabase A… | US-01 | TC-AUTH-01, TC-AUTH-02, TC-AUTH-03, TC-AUTH-04, TC-AUTH-05 | 5 of 5 | — |
-| FR-02 | Must | A landlord can see and change only their own data, enforced by row-… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
-| FR-03 | Must | Create, edit and archive properties and units. A unit can be archiv… | US-03 | TC-SETUP-01, TC-SETUP-02, TC-SETUP-03, TC-SETUP-04 | 4 of 4 | — |
+| FR-02 | Must | A landlord can see and change only their own data, enforced by row-… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 2 of 4 | R-04 |
+| FR-03 | Must | Create, edit and archive properties and units. A unit can be archiv… | US-03 | TC-SETUP-01, TC-SETUP-02, TC-SETUP-03, TC-SETUP-04 | 3 of 4 | — |
 | FR-04 | Must | Create, edit and archive tenants with name and contact details. | US-04 | TC-SETUP-05, TC-SETUP-06, TC-SETUP-07 | 3 of 3 | — |
-| FR-05 | Must | Create a lease (unit, tenant, start, end, monthly rent, due day). I… | US-05 | TC-LEASE-01, TC-LEASE-02, TC-LEASE-03 | 3 of 3 | — |
-| FR-06 | Must | A lease cannot become `active` without a recorded deposit or an exp… | US-06 | TC-LEASE-04, TC-LEASE-05, TC-LEASE-06, TC-LEASE-07 | 4 of 4 | R-03 |
+| FR-05 | Must | Create a lease (unit, tenant, start, end, monthly rent, due day). I… | US-05 | TC-LEASE-01, TC-LEASE-02, TC-LEASE-03 | 0 of 3 | — |
+| FR-06 | Must | A lease cannot become `active` without a recorded deposit or an exp… | US-06 | TC-LEASE-04, TC-LEASE-05, TC-LEASE-06, TC-LEASE-07 | 0 of 4 | R-03 |
 | FR-07 | Must | Change the rent mid-lease from an effective month. Earlier charges… | US-07 | TC-LEASE-08, TC-LEASE-09 | 0 of 2 | — |
 | FR-08 | Must | Generate the month's rent charge for every active lease. Running it… | US-10 | TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-07 | 0 of 5 | R-01 |
 | FR-09 | Must | Prorate the first and last month by actual days occupied. | US-09, US-11 | TC-CHG-05, TC-CHG-06, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 0 of 5 | R-05, R-09 |
@@ -21,7 +21,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-11 | Must | Allocate a payment to open charges, oldest first by default, with m… | US-13 | TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07 | 0 of 4 | R-02 |
 | FR-12 | Must | Hold any unallocated amount as credit and apply it to the next open… | US-14 | TC-PAY-08, TC-PAY-09 | 0 of 2 | R-08 |
 | FR-13 | Should | Reverse a payment (for example a bounced transfer) without deleting… | US-15 | TC-PAY-10, TC-PAY-11 | 0 of 2 | R-06 |
-| FR-14 | Must | Record a deposit received (full or in instalments) against a lease,… | US-17 | TC-DEP-01, TC-DEP-02 | 2 of 2 | — |
+| FR-14 | Must | Record a deposit received (full or in instalments) against a lease,… | US-17 | TC-DEP-01, TC-DEP-02 | 0 of 2 | — |
 | FR-15 | Must | Record deposit deductions with an amount and a reason. | US-18 | TC-DEP-03, TC-DEP-04 | 0 of 2 | — |
 | FR-16 | Must | Calculate the refund as deposit − deductions and track its status (… | US-19 | TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08 | 0 of 4 | R-07 |
 | FR-17 | Must | Record an early move-out: set the move-out date, prorate the final… | US-09 | TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 0 of 3 | R-05 |
@@ -31,9 +31,9 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-21 | Must | Lease ledger view: charges, payments, allocations and running balan… | US-16 | TC-PAY-12, TC-PAY-13 | 0 of 2 | — |
 | FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 0 of 1 | — |
 | FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 0 of 1 | — |
-| NFR-01 | Must | Money is stored as integer minor units. No floating-point arithmeti… | — | TC-NFR-08 | 1 of 1 | R-05 |
+| NFR-01 | Must | Money is stored as integer minor units. No floating-point arithmeti… | — | TC-NFR-08 | 0 of 1 | R-05 |
 | NFR-02 | Must | Ledger rows (charges, payments, allocations, deductions) are never… | US-15 | TC-PAY-10, TC-PAY-11 | 0 of 2 | R-06 |
-| NFR-03 | Must | Every table has RLS enabled; an automated test proves user B cannot… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
+| NFR-03 | Must | Every table has RLS enabled; an automated test proves user B cannot… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 2 of 4 | R-04 |
 | NFR-04 | Must | Balances and statuses are derived from ledger rows, never stored by… | US-16 | TC-PAY-12, TC-PAY-13 | 0 of 2 | — |
 | NFR-05 | Must | Every ledger row records who created it and when. | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 0 of 3 | — |
 | NFR-06 | Should | Core flows are usable with keyboard only and meet WCAG 2.2 AA colou… | — | TC-NFR-05 | 0 of 1 | — |
@@ -48,9 +48,9 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | Story | Title | Sprint | Built in |
 | --- | --- | --- | --- |
 | US-01 | Sign up and sign in | S1 | `src/app/(app)/page.tsx:5`<br>`src/app/auth/actions.ts:2`<br>`src/lib/auth.ts:1`<br>`src/lib/supabase/middleware.ts:6` |
-| US-02 | My data stays mine | S1 | — |
-| US-03 | Properties and units | S1 | — |
-| US-04 | Tenants | S1 | — |
+| US-02 | My data stays mine | S1 | `supabase/migrations/20261017100000_base.sql:5`<br>`supabase/migrations/20261017100100_properties_units.sql:1`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
+| US-03 | Properties and units | S1 | `src/app/(app)/properties/[id]/page.tsx:9`<br>`src/app/(app)/properties/actions.ts:2`<br>`src/app/(app)/properties/page.tsx:11`<br>`supabase/migrations/20261017100100_properties_units.sql:1` |
+| US-04 | Tenants | S1 | `src/app/(app)/tenants/[id]/page.tsx:6`<br>`src/app/(app)/tenants/actions.ts:2`<br>`src/app/(app)/tenants/page.tsx:8`<br>`supabase/migrations/20261017100200_tenants.sql:1` |
 | US-05 | Create a lease | S1 | — |
 | US-06 | No active lease without a deposit decision | S1 | — |
 | US-07 | Change rent mid-lease | S3 | — |
@@ -85,29 +85,24 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-AUTH-04 | US-01 | TC-AUTH-04 Given an account exists for an email, when I sign up again with it, then I get a clear error and no second account | `e2e/auth.spec.ts:30` |
 | TC-AUTH-05 | US-01 | TC-AUTH-05 Given I'm signed out, when I open a lease URL directly, then I'm sent to sign in and land on that lease afterwards | `e2e/auth.spec.ts:41` |
 | TC-SETUP-01 | US-03 | TC-SETUP-01 Given I'm signed in, when I add '12 Elm St' with units A and B, then both units appear under that property | `tests/db/setup.test.ts:25` |
+| TC-SETUP-01 | US-03 | TC-SETUP-01 Given I'm on Properties, when I add '12 Elm St' with units A and B, then both units appear under that property | `e2e/setup.spec.ts:16` |
 | TC-SETUP-02 | US-03 | TC-SETUP-02 Given a property already has unit A, when I add another unit A, then it's refused as a duplicate label | `tests/db/setup.test.ts:39` |
-| TC-SETUP-03 | US-03 | TC-SETUP-03 Given unit A has an active lease, when I archive unit A, then I see 'Unit has an active lease' and it stays active | `tests/db/setup.test.ts:52` |
-| TC-SETUP-04 | US-03 | TC-SETUP-04 Given unit B has no lease, when I archive unit B, then it's archived | `tests/db/setup.test.ts:62` |
-| TC-SETUP-05 | US-04 | TC-SETUP-05 Given I'm on Tenants, when I add a tenant with a name and email, then the tenant appears in the list | `tests/db/setup.test.ts:83` |
-| TC-SETUP-06 | US-04 | TC-SETUP-06 Given a tenant with neither phone nor email, when I save, then it's refused (Add a phone number or email) | `tests/db/setup.test.ts:93` |
-| TC-SETUP-07 | US-04 | TC-SETUP-07 Given a tenant exists, when I change the phone number, then the new number is stored | `tests/db/setup.test.ts:100` |
-| TC-LEASE-01 | US-05 | TC-LEASE-01 Given a unit and a tenant, when I create a lease 2026-11-01 to 2027-10-31 at 1,200.00 due day 1, then it's saved as draft | `tests/db/leases.test.ts:23` |
-| TC-LEASE-02 | US-05 | TC-LEASE-02 Given I enter an end date before the start date, when I save, then it's refused (End date must be after start date) | `tests/db/leases.test.ts:40` |
-| TC-LEASE-03 | US-05 | TC-LEASE-03 Given unit A already has an active lease, when I activate a second lease on unit A with overlapping dates, then activation is refused | `tests/db/leases.test.ts:61` |
-| TC-LEASE-04 | US-06 | TC-LEASE-04 Given a draft lease with no deposit and no waiver, when I activate it, then I see 'Record a deposit or a waiver first' and it stays draft | `tests/db/leases.test.ts:109` |
-| TC-LEASE-05 | US-06 | TC-LEASE-05 Given a draft lease with a deposit of 1,200.00 recorded, when I activate it, then it becomes active | `tests/db/leases.test.ts:116` |
-| TC-LEASE-06 | US-06 | TC-LEASE-06 Given a draft lease, when I record a waiver with a reason and date, then I can activate it and the waiver is kept on the lease | `tests/db/leases.test.ts:123` |
-| TC-LEASE-07 | US-06 | TC-LEASE-07 Given the rule is in the database, when status = 'active' is written by SQL as the database owner with no deposit or waiver, then the write fails | `tests/db/leases.test.ts:142` |
-| TC-DEP-01 | US-17 | TC-DEP-01 Given a draft lease, when I record a deposit of 1,200.00 received 2026-10-25, then it appears in the deposit section | `tests/db/leases.test.ts:151` |
-| TC-DEP-02 | US-17 | TC-DEP-02 Given a deposit paid in two instalments of 600.00, when I record both, then the deposit held is 1,200.00 | `tests/db/leases.test.ts:160` |
+| TC-SETUP-02 | US-03 | TC-SETUP-02 Given the unit label unique constraint fires, when it's shown, then it reads 'Unit label already used in this property' | `tests/unit/errors.test.ts:5` |
+| TC-SETUP-02 | US-03 | TC-SETUP-02 Given a property already has unit A, when I add another unit A, then I see 'Unit label already used in this property' | `e2e/setup.spec.ts:26` |
+| TC-SETUP-04 | US-03 | TC-SETUP-04 Given unit B has no lease, when I archive unit B, then it's archived | `tests/db/setup.test.ts:52` |
+| TC-SETUP-04 | US-03 | TC-SETUP-04 Given unit B has no lease, when I archive unit B, then it's archived and no longer listed as active | `e2e/setup.spec.ts:39` |
+| TC-SETUP-05 | US-04 | TC-SETUP-05 Given I'm on Tenants, when I add a tenant with a name and email, then the tenant appears in the list | `tests/db/setup.test.ts:61` |
+| TC-SETUP-05 | US-04 | TC-SETUP-05 Given I'm on Tenants, when I add a tenant with a name and email, then the tenant appears in the list | `e2e/setup.spec.ts:71` |
+| TC-SETUP-06 | US-04 | TC-SETUP-06 Given a tenant with neither phone nor email, when I save, then it's refused (Add a phone number or email) | `tests/db/setup.test.ts:71` |
+| TC-SETUP-06 | US-04 | TC-SETUP-06 Given the tenant contact check fires, when it's shown, then it reads 'Add a phone number or email' | `tests/unit/errors.test.ts:10` |
+| TC-SETUP-06 | US-04 | TC-SETUP-06 Given I add a tenant with neither phone nor email, when I save, then I see 'Add a phone number or email' and the name is kept | `e2e/setup.spec.ts:83` |
+| TC-SETUP-07 | US-04 | TC-SETUP-07 Given a tenant exists, when I change the phone number, then the new number is stored | `tests/db/setup.test.ts:78` |
+| TC-SETUP-07 | US-04 | TC-SETUP-07 Given a tenant exists, when I change the phone number, then the new number is shown | `e2e/setup.spec.ts:93` |
 | TC-NFR-01 | US-02 | TC-NFR-01 Given landlords A and B each have a property, when B lists properties, then B sees only B's property | `tests/db/rls.test.ts:41` |
-| TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease directly, then no row is returned | `tests/db/rls.test.ts:48` |
-| TC-NFR-03 | US-02 | TC-NFR-03 Given A's lease ID, when B tries to record a deposit against it, then the insert is rejected | `tests/db/rls.test.ts:53` |
 | TC-NFR-04 | US-02 | TC-NFR-04 Given every table in the schema, when the RLS suite runs, then each has RLS enabled and an owner_id column | `tests/db/rls.test.ts:78` |
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:90` |
-| TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (44): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-05, TC-CHG-06, TC-CHG-07, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (57): TC-SETUP-03, TC-LEASE-01, TC-LEASE-02, TC-LEASE-03, TC-LEASE-04, TC-LEASE-05, TC-LEASE-06, TC-LEASE-07, TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-05, TC-CHG-06, TC-CHG-07, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-01, TC-DEP-02, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-02, TC-NFR-03, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-08, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -128,5 +123,5 @@ UAT cases with no automated test yet (44): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 26 of 70
+- UAT cases with an automated test: 13 of 70
 - Link errors: 0

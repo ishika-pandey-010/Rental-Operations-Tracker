@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { authErrorMessage, safeNext } from "@/lib/auth";
-import type { FormState } from "@/components/form";
+import type { FormState } from "@/lib/form-state";
 
 function credentials(formData: FormData) {
   return {
