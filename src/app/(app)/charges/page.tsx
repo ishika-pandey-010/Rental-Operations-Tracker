@@ -21,14 +21,15 @@ export default async function ChargesPage({ searchParams }: { searchParams: Prom
   const { month: m, done } = await searchParams;
   const month = m && /^\d{4}-\d{2}$/.test(m) ? m : todayISO().slice(0, 7);
   const supabase = await createClient();
-  const [{ data }, { count: activeLeases }] = await Promise.all([
+  const [{ data }, { count: chargeableLeases }] = await Promise.all([
     supabase
       .from("charges")
       .select("id, lease_id, description, amount_cents, due_date, lease:leases(tenant:tenants(full_name), unit:units(label, property:properties(name)))")
       .eq("kind", "rent")
       .eq("period", `${month}-01`)
       .order("due_date"),
-    supabase.from("leases").select("id", { count: "exact", head: true }).eq("status", "active"),
+    // Ended leases still owe their final, prorated month (D-27), so they count too.
+    supabase.from("leases").select("id", { count: "exact", head: true }).in("status", ["active", "ended"]),
   ]);
   const charges = (data ?? []) as unknown as ChargeRow[];
 
@@ -36,7 +37,7 @@ export default async function ChargesPage({ searchParams }: { searchParams: Prom
     <>
       <h1>Charges</h1>
       <Flash message={done} />
-      {!activeLeases && charges.length === 0 ? (
+      {!chargeableLeases && charges.length === 0 ? (
         <p className="empty">
           No active leases to charge yet. <Link href="/leases">Activate a lease</Link> first.
         </p>

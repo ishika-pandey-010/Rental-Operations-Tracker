@@ -146,3 +146,15 @@ export async function reversePayment(_prev: FormState, formData: FormData): Prom
   done(values.lease_id, "Payment reversed. Its charges are open again.");
   return {};
 }
+
+// US-09 Early move-out (also the normal end of a lease)
+export async function recordMoveOut(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "move_out_date"]);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("move_out", { p_lease_id: values.lease_id, p_move_out_date: values.move_out_date });
+  if (error) return fail(dbErrorMessage(error), values);
+  revalidatePath(`/leases/${values.lease_id}`);
+  revalidatePath("/leases");
+  done(values.lease_id, `Move-out on ${values.move_out_date} recorded. The lease has ended.`);
+  return {};
+}

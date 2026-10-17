@@ -119,7 +119,16 @@ Filled in at the end of each sprint. Planned vs done points come from the Jira s
 - Retro, change: CI's docs job failed on two merges because I regenerated `traceability.md` while test files held back for a later branch were sitting untracked in the working tree, so the committed matrix listed tests that weren't in the commit. The fix is procedural: regenerate only from a tree where every test file is committed or removed.
 
 ### S2 review
-- Planned: 29 pts · Done: [TBD]
+- Planned: 29 pts · Done: 29 pts (US-09 to US-16, including the Should story US-15). Count from the feature map; no Jira report (OQ-17).
+- Dates: built 2026-10-18 in the same Claude Code session as S1.
+- Gate S2 → S3 (PRD §10): "charges, proration, payments, allocations and credit pass every AC as automated tests". Met: every S2 AC has a database test, and every one with a screen also has an end-to-end test. The UAT cases for these stories are still `Not run`.
+- Tests at the end of S2: 159 Vitest (unit, database, API) and 58 Playwright, passing locally; CI results on `dev` are linked from the Actions tab.
+- Demo, as run in the end-to-end suite: generate December twice ("0 new charges, 1 already existed"); record 500.00 against 1,200.00 and see 700.00 partial; overpay and watch the 300.00 credit land on January when it's generated; reverse a bounced payment; record a move-out on 2027-02-10 and see the −771.43 adjustment beside the original charge.
+- Carried over: nothing.
+- Bugs found by my own review and tests, all fixed before merge: confirmations from a redirect stacking up with the next message (three variants); the Charges page hiding Generate when every lease had ended; a zero-row update reporting "Saved" (S1, carried into every edit action since).
+- Risks changed: R-01, R-02, R-05, R-06, R-08 now have passing automated proving tests; they stay open until UAT. R-02 has a race test with two simultaneous payments.
+- Retro, keep: the two value functions (`charge_value_cents`, `payment_value_cents`) meant reversals and adjustments each changed one function, and every view and trigger followed.
+- Retro, change: three of my end-to-end failures this sprint were helpers that clicked and moved on without waiting for the result. Helpers that submit now wait for the confirmation.
 
 ### S3 review
 - Planned: 21 pts · Done: [TBD]

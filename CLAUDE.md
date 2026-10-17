@@ -107,4 +107,4 @@ make db      apply migrations to local Supabase
 
 ## Current status
 
-S1 done on `dev` (tag `s1`); S2 (money flows) in progress. S0 discovery has not run (D-16). See `docs/sprint-plan.md`, `docs/feature-map.md` and `docs/open-questions.md`.
+S1 and S2 done on `dev` (tags `s1`, `s2`); S3 (deposits, reports) in progress. S0 discovery has not run (D-16). See `docs/sprint-plan.md`, `docs/feature-map.md` and `docs/open-questions.md`.

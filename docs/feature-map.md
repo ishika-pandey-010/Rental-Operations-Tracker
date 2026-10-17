@@ -13,7 +13,7 @@ One row per feature, in build order. The user is the self-managing landlord from
 | US-17 | Record a deposit | Keep deposit money apart from rent | Deposit shows in its own section, not the rent ledger; instalments add up | Must | S1 | done |
 | US-10 | Generate monthly charges | Bill the month for every lease in one action | One charge per active lease with the right due date; running it again creates none and says "0 new charges, 3 already existed"; two runs at once still make one each; drafts aren't charged | Must | S2 | done |
 | US-11 | Prorate the first month | Bill a mid-month move-in fairly | Start 2026-11-16 at 1,200.00 gives 600.00; start on the 1st gives full rent | Must | S2 | done |
-| US-09 | Early move-out | Close a lease early without hand maths | Move-out 2027-02-10 gives a 428.57 February; if February was already billed, a −771.43 adjustment is added; nothing is charged after | Must | S2 | not started |
+| US-09 | Early move-out | Close a lease early without hand maths | Move-out 2027-02-10 gives a 428.57 February; if February was already billed, a −771.43 adjustment is added; nothing is charged after | Must | S2 | done |
 | US-12 | Record a payment | Make the app match the bank | Payment shows with who recorded it and when; repeated reference refused; zero or negative refused | Must | S2 | done |
 | US-13 | Partial payments | See what's still owed after a part-payment | 500.00 against 1,200.00 leaves 700.00 `partial`; default allocation is oldest first; manual override; database refuses over-allocation | Must | S2 | done |
 | US-14 | Overpayment becomes credit | Let extra money pay next month | 1,500.00 against 1,200.00 leaves 300.00 credit; it's applied to January when January is charged, shown as a ledger row | Must | S2 | done |

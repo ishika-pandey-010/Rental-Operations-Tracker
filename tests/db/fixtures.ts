@@ -131,3 +131,7 @@ export async function leaseWithNovDec(db: Db) {
 export async function reversePayment(db: Db, paymentId: string, reason = "bounced", on = "2026-12-05") {
   await db.query("select reverse_payment($1, $2, $3)", [paymentId, on, reason]);
 }
+
+export async function moveOut(db: Db, leaseId: string, on: string) {
+  await db.query("select move_out($1, $2)", [leaseId, on]);
+}

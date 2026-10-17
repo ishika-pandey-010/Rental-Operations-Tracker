@@ -8,6 +8,7 @@ import { getLease, unitName } from "../data";
 import { ActivateButton, DepositForm, WaiverForm } from "../forms";
 import { ChargesTable, LedgerTable, type ChargeBalance, type LedgerRow } from "./money";
 import { PaymentForm } from "./payment-form";
+import { MoveOutForm } from "./move-out-form";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -64,6 +65,9 @@ export default async function LeasePage({
         </span>
       </div>
       <Flash message={done} />
+      {lease.status === "active" && lease.end_date < today && (
+        <p className="alert warn">Past end date: record the move-out below. No rent is charged after {lease.end_date}.</p>
+      )}
 
       {lease.status !== "draft" && (
         <>
@@ -119,6 +123,11 @@ export default async function LeasePage({
         <p>
           {lease.start_date} to {lease.end_date} · Rent due on <strong>Day {lease.due_day}</strong> of each month
         </p>
+        {lease.move_out_date && (
+          <p>
+            <strong>Moved out {lease.move_out_date}</strong>
+          </p>
+        )}
         <ul>
           {rent.map((r) => (
             <li key={r.effective_period}>
@@ -182,6 +191,20 @@ export default async function LeasePage({
           <WaiverForm leaseId={lease.id} today={today} />
         )}
       </section>
+
+      {lease.status === "active" && (
+        <section className="card" aria-labelledby="moveout-h">
+          <h2 id="moveout-h" style={{ marginTop: 0 }}>
+            Move-out
+          </h2>
+          <MoveOutForm
+            leaseId={lease.id}
+            defaultDate={today < lease.start_date ? lease.start_date : today > lease.end_date ? lease.end_date : today}
+            min={lease.start_date}
+            max={lease.end_date}
+          />
+        </section>
+      )}
 
       {lease.status === "draft" && (
         <section className="card" aria-labelledby="activate-h">
