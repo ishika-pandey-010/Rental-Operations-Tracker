@@ -1,7 +1,7 @@
 // US-03 Properties and units · US-04 Tenants
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { connect, createUser, expectDbError, type Db } from "./helpers";
-import { addProperty, addTenant } from "./fixtures";
+import { activeLease, addProperty, addTenant } from "./fixtures";
 
 let db: Db;
 let landlord: string;
@@ -49,11 +49,33 @@ describe("US-03 Properties and units", () => {
     expect(err.constraint).toBe("properties_name_not_blank");
   });
 
+  it("TC-SETUP-03 Given unit A has an active lease, when I archive unit A, then I see 'Unit has an active lease' and it stays active", async () => {
+    const { unitId } = await activeLease(db);
+    const err = await expectDbError(() =>
+      db.query("update units set archived_at = now() where id = $1", [unitId]),
+    );
+    expect(err.message).toBe("Unit has an active lease");
+    const { archived_at } = await db.one("select archived_at from units where id = $1", [unitId]);
+    expect(archived_at).toBeNull();
+  });
+
   it("TC-SETUP-04 Given unit B has no lease, when I archive unit B, then it's archived", async () => {
     const { unitIds } = await addProperty(db, "12 Elm St", ["A", "B"]);
     await db.query("update units set archived_at = now() where id = $1", [unitIds[1]]);
     const active = await db.many("select label from units where archived_at is null");
     expect(active).toEqual([{ label: "A" }]);
+  });
+
+  it("Given a unit of a property has an active lease, when I archive the property, then I see 'Property has a unit with an active lease'", async () => {
+    const { unitId } = await activeLease(db);
+    const { property_id } = await db.one<{ property_id: string }>(
+      "select property_id from units where id = $1",
+      [unitId],
+    );
+    const err = await expectDbError(() =>
+      db.query("update properties set archived_at = now() where id = $1", [property_id]),
+    );
+    expect(err.message).toBe("Property has a unit with an active lease");
   });
 });
 
@@ -79,5 +101,13 @@ describe("US-04 Tenants", () => {
     const id = await addTenant(db);
     await db.query("update tenants set phone = '555-0199' where id = $1", [id]);
     expect((await db.one("select phone from tenants where id = $1", [id])).phone).toBe("555-0199");
+  });
+
+  it("Given a tenant has an active lease, when I archive the tenant, then I see 'Tenant has an active lease'", async () => {
+    const { tenantId } = await activeLease(db);
+    const err = await expectDbError(() =>
+      db.query("update tenants set archived_at = now() where id = $1", [tenantId]),
+    );
+    expect(err.message).toBe("Tenant has an active lease");
   });
 });
