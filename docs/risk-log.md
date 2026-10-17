@@ -25,3 +25,4 @@ Reviewed at every sprint review. **Likelihood** and **Impact** are 1 (low) to 3 
 | R-12 | Scope creep (late fees, maintenance, tenant portal) | 2 | 2 | 4 | Out-of-scope list in PRD §8 and CLAUDE.md; every new ask logged in decisions.md | Each sprint planning | Open |
 | R-13 | Sprints slip (solo builder, ~12 h/week) | 2 | 2 | 4 | MoSCoW: cut Could, then Should, never Must; one-week sprints show slip early | Each sprint review | Open |
 | R-14 | Portfolio numbers can't be traced to evidence | 2 | 3 | 6 | Results generated from `docs/uat/test-cases.csv` and `docs/user-test.md` only (CLAUDE.md rules 5–6) | v1 release | Open |
+| R-15 | S1–S3 are built before discovery runs (D-16), so a problem the interviews cut may already have code | 2 | 2 | 4 | Each rule is a separate constraint or trigger with its own test, so cutting one is a single migration; discovery results are compared against the feature map before release | Discovery synthesis | Open |

@@ -4,7 +4,7 @@
 | --- | --- |
 | **Status** | Draft v0.1 — in review (S0) |
 | **Owner** | @ishika-pandey-010 (product + delivery) |
-| **Last updated** | 2026-10-15 |
+| **Last updated** | 2026-10-17 |
 | **Related** | [User stories](user-stories.md) · [Data model](data-model.md) · [Risk log](risk-log.md) · [Decisions](decisions.md) · [Traceability](traceability.md) |
 
 ## 1. Summary
@@ -154,13 +154,14 @@ Priority uses MoSCoW. **Must** = v1 cannot ship without it.
 | # | Question | Owner | Due | Answer |
 | --- | --- | --- | --- | --- |
 | Q1 | Prorate by actual days in the month or a fixed 30-day month? | PM | S0 | Actual days for v1 (D-04); revisit if discovery says otherwise |
-| Q2 | Round proration half-up to the cent, or always in the tenant's favour? | PM | S0 | [TBD] |
-| Q3 | Does the overdue report count a charge as overdue on the due day or the day after? | PM | S1 | [TBD] |
+| Q2 | Round proration half-up to the cent, or always in the tenant's favour? | PM | S0 | Half-up, already decided in D-04 (OQ-04) |
+| Q3 | Does the overdue report count a charge as overdue on the due day or the day after? | PM | S1 | The day after: US-20 AC1 counts 10 days from 2026-12-01 to 2026-12-11 (OQ-05) |
 | Q4 | Should credit apply automatically to the next charge or wait for landlord confirmation? | PM | S1 | Automatic, shown in the ledger (D-07) |
-| Q5 | Which currency does the demo account use? | PM | S1 | [TBD] |
+| Q5 | Which currency does the demo account use? | PM | S1 | USD, as a display setting (D-25) |
 
 ## 12. Change history
 
 | Version | Date | Change |
 | --- | --- | --- |
 | 0.1 | 2026-10-15 | First draft from build plan and competitive research |
+| 0.2 | 2026-10-17 | Q2, Q3 and Q5 answered; open build questions moved to [open-questions.md](open-questions.md) |
