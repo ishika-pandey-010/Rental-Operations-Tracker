@@ -36,7 +36,7 @@ All tables have `id uuid`, `owner_id uuid default auth.uid()`, `created_at`, `cr
 | `charges` | lease_id, kind (`rent`, `deposit_shortfall`), period, amount_cents, due_date | Partial unique index `(lease_id, period) WHERE kind = 'rent'` makes duplicate rent impossible; `amount_cents > 0` | FR-08, FR-16 |
 | `charge_adjustments` | charge_id, amount_cents (±), reason | Proration on move-out adds a negative adjustment; the charge row itself is never edited | FR-17, NFR-02 |
 | `payments` | lease_id, amount_cents, paid_on, method (`bank_transfer`, `cash`, `cheque`, `card`, `other`), reference | Unique index on `(lease_id, lower(btrim(reference)))` where a reference is given stops double entry, so "TRX-881" and "trx-881 " collide (D-24); `amount_cents > 0`; only on active or ended leases | FR-10 |
-| `payment_reversals` | payment_id (unique), reason, reversed_on | One reversal per payment; reversing releases its allocations | FR-13 |
+| `payment_reversals` | payment_id (unique), reason, reversed_on | One reversal per payment. An after-insert trigger releases everything the payment paid with negative allocation rows, however the reversal was written, then lets other credit fill the reopened charges. A reversed payment can't be allocated again | FR-13 |
 | `payment_allocations` | payment_id, charge_id, amount_cents (±) | Trigger: net allocations to a charge ≤ its adjusted amount, and net allocations from a payment ≤ the payment. Negative rows release money back to credit | FR-11, FR-12 |
 | `deposits` | lease_id, amount_cents, received_on | One row per instalment; deposit held = sum | FR-14 |
 | `deposit_deductions` | lease_id, amount_cents, reason | `reason` NOT NULL and not blank | FR-15 |

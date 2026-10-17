@@ -22,6 +22,8 @@ export const CONSTRAINT_MESSAGES: Record<string, string> = {
   payments_amount_positive: "Amount must be more than zero",
   payments_reference_per_lease: "This reference is already recorded for this lease",
   payment_allocations_amount_nonzero: "Each amount must be more than zero",
+  payment_reversals_payment_id_key: "This payment is already reversed",
+  payment_reversals_reason_not_blank: "Add a reason, for example 'bounced'",
 };
 
 type DbErrorLike = { code?: string; message?: string; details?: string | null; hint?: string | null };

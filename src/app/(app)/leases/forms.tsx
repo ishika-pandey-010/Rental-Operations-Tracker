@@ -78,7 +78,9 @@ export function DepositForm({
   today,
   suggested,
   canActivate,
+  hideOk,
 }: {
+  hideOk?: boolean;
   leaseId: string;
   today: string;
   suggested?: string;
@@ -88,7 +90,7 @@ export function DepositForm({
   const v = state.values ?? {};
   return (
     <form action={action} key={state.seq}>
-      <FormMessage state={state} />
+      <FormMessage state={hideOk ? { ...state, ok: undefined } : state} />
       <input type="hidden" name="lease_id" value={leaseId} />
       <div className="row">
         <div className="field">

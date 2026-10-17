@@ -39,6 +39,8 @@ export default async function LeasePage({
       supabase.from("payments").select("method").eq("lease_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       supabase.auth.getUser(),
     ]);
+  const { data: reversedRows } = await supabase.from("payment_balances").select("payment_id").eq("lease_id", id).eq("reversed", true);
+  const reversed = new Set((reversedRows ?? []).map((r) => r.payment_id as string));
   const charges = (chargeData ?? []) as ChargeBalance[];
   const ledger = (ledgerData ?? []) as LedgerRow[];
   // A second query to sum in Postgres isn't worth it; BigInt keeps the sum integer-only.
@@ -85,6 +87,7 @@ export default async function LeasePage({
               Record a payment
             </h2>
             <PaymentForm
+              hideOk={Boolean(done)}
               leaseId={lease.id}
               today={today}
               lastMethod={lastPayment?.method ?? "bank_transfer"}
@@ -104,7 +107,7 @@ export default async function LeasePage({
             <h2 id="ledger-h" style={{ marginTop: 0 }}>
               Ledger
             </h2>
-            <LedgerTable rows={ledger} userId={auth.user?.id ?? ""} />
+            <LedgerTable rows={ledger} userId={auth.user?.id ?? ""} leaseId={lease.id} reversed={reversed} today={today} />
           </section>
         </>
       )}
@@ -174,7 +177,7 @@ export default async function LeasePage({
             Deposit waived on {lease.deposit_waived_on}: {lease.deposit_waiver_reason}
           </p>
         )}
-        {lease.status !== "ended" && <DepositForm key={done ?? ""} leaseId={lease.id} today={today} suggested={centsToInput(rent[0]?.monthly_rent_cents)} canActivate={lease.status === "draft"} />}
+        {lease.status !== "ended" && <DepositForm hideOk={Boolean(done)} leaseId={lease.id} today={today} suggested={centsToInput(rent[0]?.monthly_rent_cents)} canActivate={lease.status === "draft"} />}
         {lease.status === "draft" && !lease.deposit_waived_on && (deposits?.length ?? 0) === 0 && (
           <WaiverForm leaseId={lease.id} today={today} />
         )}

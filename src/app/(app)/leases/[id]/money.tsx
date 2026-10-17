@@ -1,6 +1,7 @@
 // US-13, US-16: the charges table and the lease ledger (server components).
 import { formatMoney } from "@/lib/money";
 import { formatTimestamp } from "@/lib/dates";
+import { ReverseForm } from "./reverse-form";
 
 export type ChargeBalance = {
   charge_id: string;
@@ -63,7 +64,19 @@ export function ChargesTable({ charges }: { charges: ChargeBalance[] }) {
   );
 }
 
-export function LedgerTable({ rows, userId }: { rows: LedgerRow[]; userId: string }) {
+export function LedgerTable({
+  rows,
+  userId,
+  leaseId,
+  reversed,
+  today,
+}: {
+  rows: LedgerRow[];
+  userId: string;
+  leaseId: string;
+  reversed: Set<string>;
+  today: string;
+}) {
   if (rows.length === 0)
     return <p className="muted">Nothing charged or paid yet. Charges, payments and where each payment went will appear here in date order.</p>;
   return (
@@ -93,10 +106,19 @@ export function LedgerTable({ rows, userId }: { rows: LedgerRow[]; userId: strin
                 <td>{r.entry_date}</td>
                 <td>
                   {r.description}
+                  {r.entry_type === "payment" && reversed.has(r.ref_id) && (
+                    <>
+                      {" "}
+                      <span className="badge reversed">Reversed</span>
+                    </>
+                  )}
                   {r.entry_type === "payment" && (
                     <span className="hint">
                       Recorded {formatTimestamp(r.created_at)} by {r.created_by === userId ? "you" : "another user"}
                     </span>
+                  )}
+                  {r.entry_type === "payment" && !reversed.has(r.ref_id) && (
+                    <ReverseForm leaseId={leaseId} paymentId={r.ref_id} today={today} />
                   )}
                 </td>
                 <td className="num">{formatMoney(r.amount_cents)}</td>

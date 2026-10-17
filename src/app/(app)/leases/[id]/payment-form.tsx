@@ -22,7 +22,10 @@ export function PaymentForm({
   lastMethod,
   openCharges,
   unpaid,
+  hideOk,
 }: {
+  /** True while a page-level confirmation is showing, so two messages never stack. */
+  hideOk?: boolean;
   leaseId: string;
   today: string;
   lastMethod: string;
@@ -40,6 +43,7 @@ export function PaymentForm({
       lastMethod={lastMethod}
       openCharges={openCharges}
       unpaid={unpaid}
+      hideOk={hideOk}
     />
   );
 }
@@ -52,7 +56,9 @@ function PaymentFields({
   lastMethod,
   openCharges,
   unpaid,
+  hideOk,
 }: {
+  hideOk?: boolean;
   unpaid?: string;
   state: FormState;
   action: (fd: FormData) => void;
@@ -65,7 +71,7 @@ function PaymentFields({
   const [mode, setMode] = useState(v.mode === "manual" ? "manual" : "oldest");
   return (
     <form action={action}>
-      <FormMessage state={state} />
+      <FormMessage state={hideOk ? { ...state, ok: undefined } : state} />
       <input type="hidden" name="lease_id" value={leaseId} />
       <div className="row">
         <div className="field">
