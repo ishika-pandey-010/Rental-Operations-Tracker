@@ -89,6 +89,8 @@ export async function generateCharges(page: Page, month: string) {
   await page.goto("/charges");
   await page.getByLabel("Month").fill(month);
   await page.getByRole("button", { name: "Generate rent" }).click();
+  // Wait for the result, so a following goto() can't cut the request off.
+  await expect(statusIn(page)).toContainText("already existed");
 }
 
 /** Records a payment from the lease page. */
