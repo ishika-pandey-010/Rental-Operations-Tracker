@@ -19,6 +19,9 @@ export const CONSTRAINT_MESSAGES: Record<string, string> = {
   leases_move_out_in_term: "The move-out date must fall between the lease's start and end dates",
   lease_rent_schedule_rent_positive: "Rent must be more than zero",
   deposits_amount_positive: "Amount must be more than zero",
+  payments_amount_positive: "Amount must be more than zero",
+  payments_reference_per_lease: "This reference is already recorded for this lease",
+  payment_allocations_amount_nonzero: "Each amount must be more than zero",
 };
 
 type DbErrorLike = { code?: string; message?: string; details?: string | null; hint?: string | null };

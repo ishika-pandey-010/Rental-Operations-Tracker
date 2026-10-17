@@ -6,6 +6,8 @@ import { formatMoney, centsToInput } from "@/lib/money";
 import { monthName, todayISO } from "@/lib/dates";
 import { getLease, unitName } from "../data";
 import { ActivateButton, DepositForm, WaiverForm } from "../forms";
+import { ChargesTable, LedgerTable, type ChargeBalance, type LedgerRow } from "./money";
+import { PaymentForm } from "./payment-form";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -23,10 +25,25 @@ export default async function LeasePage({
   if (!lease) notFound();
 
   const supabase = await createClient();
-  const [{ data: deposits }, { data: summary }] = await Promise.all([
-    supabase.from("deposits").select("id, amount_cents, received_on, note").eq("lease_id", id).order("received_on"),
-    supabase.from("lease_deposit_summary").select("received_cents, held_cents").eq("lease_id", id).single(),
-  ]);
+  const [{ data: deposits }, { data: summary }, { data: chargeData }, { data: creditRow }, { data: ledgerData }, { data: lastPayment }, { data: auth }] =
+    await Promise.all([
+      supabase.from("deposits").select("id, amount_cents, received_on, note").eq("lease_id", id).order("received_on"),
+      supabase.from("lease_deposit_summary").select("received_cents, held_cents").eq("lease_id", id).single(),
+      supabase
+        .from("charge_balances")
+        .select("charge_id, description, due_date, value_cents, allocated_cents, balance_cents, status")
+        .eq("lease_id", id)
+        .order("due_date"),
+      supabase.from("lease_credit").select("credit_cents").eq("lease_id", id).single(),
+      supabase.from("lease_ledger").select("*").eq("lease_id", id).order("seq"),
+      supabase.from("payments").select("method").eq("lease_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      supabase.auth.getUser(),
+    ]);
+  const charges = (chargeData ?? []) as ChargeBalance[];
+  const ledger = (ledgerData ?? []) as LedgerRow[];
+  // A second query to sum in Postgres isn't worth it; BigInt keeps the sum integer-only.
+  const owed = charges.reduce((s, c) => s + BigInt(c.balance_cents), 0n);
+  const credit = creditRow?.credit_cents ?? 0;
   const today = todayISO();
   const rent = [...lease.rent].sort((a, b) => a.effective_period.localeCompare(b.effective_period));
   const statusLabel = lease.status[0].toUpperCase() + lease.status.slice(1);
@@ -45,6 +62,52 @@ export default async function LeasePage({
         </span>
       </div>
       <Flash message={done} />
+
+      {lease.status !== "draft" && (
+        <>
+          <div className="tiles">
+            <div className="tile">
+              <div className="label">Unpaid charges (due or not yet due)</div>
+              <div className="value" data-testid="lease-owed">
+                {formatMoney(owed)}
+              </div>
+            </div>
+            <div className="tile">
+              <div className="label">Credit (paid ahead)</div>
+              <div className="value" data-testid="lease-credit">
+                {formatMoney(credit)}
+              </div>
+            </div>
+          </div>
+
+          <section className="card" aria-labelledby="pay-h">
+            <h2 id="pay-h" style={{ marginTop: 0 }}>
+              Record a payment
+            </h2>
+            <PaymentForm
+              leaseId={lease.id}
+              today={today}
+              lastMethod={lastPayment?.method ?? "bank_transfer"}
+              openCharges={charges.filter((c) => c.balance_cents > 0)}
+              unpaid={owed > 0n ? formatMoney(owed, null) : undefined}
+            />
+          </section>
+
+          <section className="card" aria-labelledby="charges-h">
+            <h2 id="charges-h" style={{ marginTop: 0 }}>
+              Charges
+            </h2>
+            <ChargesTable charges={charges} />
+          </section>
+
+          <section className="card" aria-labelledby="ledger-h">
+            <h2 id="ledger-h" style={{ marginTop: 0 }}>
+              Ledger
+            </h2>
+            <LedgerTable rows={ledger} userId={auth.user?.id ?? ""} />
+          </section>
+        </>
+      )}
 
       <section className="card" aria-labelledby="terms-h">
         <h2 id="terms-h" style={{ marginTop: 0 }}>

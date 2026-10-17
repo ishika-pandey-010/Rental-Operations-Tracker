@@ -35,7 +35,7 @@ All tables have `id uuid`, `owner_id uuid default auth.uid()`, `created_at`, `cr
 | `lease_rent_schedule` | lease_id, effective_period, monthly_rent_cents | `UNIQUE (lease_id, effective_period)`; can't add a row for a period already charged | FR-07 |
 | `charges` | lease_id, kind (`rent`, `deposit_shortfall`), period, amount_cents, due_date | Partial unique index `(lease_id, period) WHERE kind = 'rent'` makes duplicate rent impossible; `amount_cents > 0` | FR-08, FR-16 |
 | `charge_adjustments` | charge_id, amount_cents (±), reason | Proration on move-out adds a negative adjustment; the charge row itself is never edited | FR-17, NFR-02 |
-| `payments` | lease_id, amount_cents, paid_on, method, reference | `UNIQUE (lease_id, reference)` stops double entry; `amount_cents > 0` | FR-10 |
+| `payments` | lease_id, amount_cents, paid_on, method (`bank_transfer`, `cash`, `cheque`, `card`, `other`), reference | Unique index on `(lease_id, lower(btrim(reference)))` where a reference is given stops double entry, so "TRX-881" and "trx-881 " collide (D-24); `amount_cents > 0`; only on active or ended leases | FR-10 |
 | `payment_reversals` | payment_id (unique), reason, reversed_on | One reversal per payment; reversing releases its allocations | FR-13 |
 | `payment_allocations` | payment_id, charge_id, amount_cents (±) | Trigger: net allocations to a charge ≤ its adjusted amount, and net allocations from a payment ≤ the payment. Negative rows release money back to credit | FR-11, FR-12 |
 | `deposits` | lease_id, amount_cents, received_on | One row per instalment; deposit held = sum | FR-14 |
@@ -51,9 +51,10 @@ Nothing below is stored. Each is a SQL view so the numbers can't drift from the 
 | View | Returns | Used by |
 | --- | --- | --- |
 | `lease_deposit_summary` | per lease: deposits received, deposit held | Lease page (US-17) |
-| `charge_balances` | per charge: amount + adjustments, allocated, balance, status (`open`, `partial`, `paid`) | Ledger, reports |
+| `charge_balances` | per charge: amount, adjustments, value (amount + adjustments), allocated, balance, status (`open`, `partial`, `paid`, or `cancelled` when adjustments bring the value to 0) | Lease page, reports |
+| `payment_balances` | per payment: amount, value (0 once reversed), allocated, unallocated | Credit, auto-apply |
 | `lease_credit` | per lease: payments not reversed − net allocations | Ledger, credit auto-apply |
-| `lease_ledger` | charges, adjustments, payments, reversals in date order with running balance | US-16 |
+| `lease_ledger` | charges, adjustments, payments, reversals in date order with a running balance (positive = tenant owes). Allocation rows show where each payment went ("Applied to…", "Credit applied to…") and don't move the balance | US-16 |
 | `overdue_rent` | charges past due with balance > 0, days overdue | US-20 |
 | `pending_refunds` | ended leases with refund status ≠ `paid`, days since end | US-21 |
 

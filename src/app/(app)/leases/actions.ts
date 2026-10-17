@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NOT_FOUND, dbErrorMessage } from "@/lib/errors";
 import { fail, pick, succeed, type FormState } from "@/lib/form-state";
-import { formatMoney, parseMoney } from "@/lib/money";
+import { formatMoney, parseMoney, positiveAmount } from "@/lib/money";
 
 const done = (id: string, message: string) => redirect(`/leases/${id}?done=${encodeURIComponent(message)}`);
 
@@ -83,4 +83,50 @@ export async function activateLease(_prev: FormState, formData: FormData): Promi
   revalidatePath("/leases");
   done(id, "Lease is active");
   return {};
+}
+
+// US-12 Record a payment · US-13 default and manual allocation
+export async function recordPayment(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "amount", "paid_on", "method", "reference", "mode"]);
+  const allocFields = [...formData.keys()].filter((k) => k.startsWith("alloc_"));
+  for (const k of allocFields) values[k] = String(formData.get(k) ?? "").trim();
+
+  const amount = positiveAmount(values.amount, "payment");
+  if ("error" in amount) return fail(amount.error, values);
+
+  let allocations: { charge_id: string; amount_cents: number }[] | null = null;
+  if (values.mode === "manual") {
+    allocations = [];
+    for (const k of allocFields) {
+      if (!values[k]) continue;
+      const part = positiveAmount(values[k]);
+      if ("error" in part) return fail(part.error, values);
+      allocations.push({ charge_id: k.slice("alloc_".length), amount_cents: part.cents });
+    }
+    // An early, friendlier version of the check the allocation trigger makes
+    // anyway. BigInt keeps it integer-only (CLAUDE.md money rules).
+    const total = allocations.reduce((s, a) => s + BigInt(a.amount_cents), 0n);
+    if (total > BigInt(amount.cents))
+      return fail(
+        `The amounts for each charge add up to ${formatMoney(total)}, more than the ${formatMoney(amount.cents)} received`,
+        values,
+      );
+  }
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.rpc("record_payment", {
+      p_lease_id: values.lease_id,
+      p_amount_cents: amount.cents,
+      p_paid_on: values.paid_on,
+      p_method: values.method,
+      p_reference: values.reference || null,
+      p_allocations: allocations,
+    });
+    if (error) return fail(dbErrorMessage(error), values);
+  } catch (err) {
+    return fail(dbErrorMessage(err as Error), values);
+  }
+  revalidatePath(`/leases/${values.lease_id}`);
+  return succeed(`Payment of ${formatMoney(amount.cents)} recorded`, { method: values.method, paid_on: values.paid_on });
 }

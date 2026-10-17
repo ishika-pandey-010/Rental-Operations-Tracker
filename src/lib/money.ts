@@ -38,3 +38,15 @@ export function formatMoney(cents: number | bigint | string | null | undefined, 
 export function centsToInput(cents: number | null | undefined): string {
   return cents == null ? "" : formatMoney(cents, null);
 }
+
+export type AmountCheck = { cents: number } | { error: string };
+
+/** For amounts that must be above zero: "0" and "-5" get the AC wording, junk gets an example. */
+export function positiveAmount(input: string, what = "amount"): AmountCheck {
+  const text = String(input ?? "").trim();
+  if (/^-/.test(text) && parseMoney(text.slice(1)) !== null) return { error: "Amount must be more than zero" };
+  const cents = parseMoney(text);
+  if (cents === null) return { error: `Enter the ${what} as an amount like 1,200.00` };
+  if (cents === 0) return { error: "Amount must be more than zero" };
+  return { cents };
+}
