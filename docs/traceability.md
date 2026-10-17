@@ -15,8 +15,8 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-05 | Must | Create a lease (unit, tenant, start, end, monthly rent, due day). I… | US-05 | TC-LEASE-01, TC-LEASE-02, TC-LEASE-03 | 3 of 3 | — |
 | FR-06 | Must | A lease cannot become `active` without a recorded deposit or an exp… | US-06 | TC-LEASE-04, TC-LEASE-05, TC-LEASE-06, TC-LEASE-07 | 4 of 4 | R-03 |
 | FR-07 | Must | Change the rent mid-lease from an effective month. Earlier charges… | US-07 | TC-LEASE-08, TC-LEASE-09 | 0 of 2 | — |
-| FR-08 | Must | Generate the month's rent charge for every active lease. Running it… | US-10 | TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-07 | 0 of 5 | R-01 |
-| FR-09 | Must | Prorate the first and last month by actual days occupied. | US-09, US-11 | TC-CHG-05, TC-CHG-06, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 0 of 5 | R-05, R-09 |
+| FR-08 | Must | Generate the month's rent charge for every active lease. Running it… | US-10 | TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-07 | 5 of 5 | R-01 |
+| FR-09 | Must | Prorate the first and last month by actual days occupied. | US-09, US-11 | TC-CHG-05, TC-CHG-06, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 2 of 5 | R-05, R-09 |
 | FR-10 | Must | Record a payment with date, amount, method and reference. A referen… | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 0 of 3 | — |
 | FR-11 | Must | Allocate a payment to open charges, oldest first by default, with m… | US-13 | TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07 | 0 of 4 | R-02 |
 | FR-12 | Must | Hold any unallocated amount as credit and apply it to the next open… | US-14 | TC-PAY-08, TC-PAY-09 | 0 of 2 | R-08 |
@@ -55,9 +55,9 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-06 | No active lease without a deposit decision | S1 | `src/app/(app)/leases/[id]/page.tsx:12`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:1` |
 | US-07 | Change rent mid-lease | S3 | — |
 | US-08 | Renew a lease | S3 | — |
-| US-09 | Early move-out | S2 | — |
-| US-10 | Generate monthly charges | S2 | — |
-| US-11 | Prorate the first month | S2 | — |
+| US-09 | Early move-out | S2 | `supabase/migrations/20261018100000_charges.sql:67` |
+| US-10 | Generate monthly charges | S2 | `src/app/(app)/charges/actions.ts:2`<br>`src/app/(app)/charges/page.tsx:19`<br>`src/lib/charges.ts:1`<br>`supabase/migrations/20261018100000_charges.sql:1` |
+| US-11 | Prorate the first month | S2 | `src/app/(app)/charges/page.tsx:19`<br>`supabase/migrations/20261018100000_charges.sql:1` |
 | US-12 | Record a payment | S2 | — |
 | US-13 | Partial payments | S2 | — |
 | US-14 | Overpayment becomes credit | S2 | — |
@@ -65,7 +65,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-16 | Lease ledger | S2 | — |
 | US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:12`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-18 | Deposit deductions | S3 | — |
-| US-19 | Refund or amount owed | S3 | — |
+| US-19 | Refund or amount owed | S3 | `supabase/migrations/20261018100000_charges.sql:4` |
 | US-20 | Overdue rent | S3 | — |
 | US-21 | Pending refunds | S3 | — |
 | US-22 | CSV export | S3 | — |
@@ -114,6 +114,17 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-LEASE-06 | US-06 | TC-LEASE-06 Given a draft lease, when I record a waiver with a reason and date, then I can activate it and the waiver is kept on the lease | `tests/db/leases.test.ts:123` |
 | TC-LEASE-06 | US-06 | TC-LEASE-06 Given a draft lease, when I record a waiver with a reason and date, then I can activate it and the waiver shows on the lease page | `e2e/leases.spec.ts:83` |
 | TC-LEASE-07 | US-06 | TC-LEASE-07 Given the rule is in the database, when status = 'active' is written by SQL as the database owner with no deposit or waiver, then the write fails | `tests/db/leases.test.ts:142` |
+| TC-CHG-01 | US-10 | TC-CHG-01 Given three active leases, when I generate charges for 2026-12, then three charges are created with each lease's rent and due date | `tests/db/charges.test.ts:25` |
+| TC-CHG-01 | US-10 | TC-CHG-01 Given two active leases, when I generate 2026-12, then two charges are listed with each lease's rent and due date | `e2e/charges.spec.ts:15` |
+| TC-CHG-02 | US-10 | TC-CHG-02 Given charges for 2026-12 already exist, when I generate 2026-12 again, then 0 are new and 3 already existed | `tests/db/charges.test.ts:35` |
+| TC-CHG-02 | US-10 | TC-CHG-02 Given 0 created and 3 existing, when it's shown, then it reads '0 new charges, 3 already existed' | `tests/unit/charges.test.ts:5` |
+| TC-CHG-02 | US-10 | TC-CHG-02 Given charges for 2026-12 exist, when I generate 2026-12 again, then I see '0 new charges, 1 already existed' | `e2e/charges.spec.ts:29` |
+| TC-CHG-03 | US-10 | TC-CHG-03 Given two generation requests for the same month at the same moment, when both finish, then exactly one charge exists per lease | `tests/db/charges.test.ts:43` |
+| TC-CHG-04 | US-10 | TC-CHG-04 Given one draft and one active lease, when I generate charges, then only the active lease is charged | `tests/db/charges.test.ts:59` |
+| TC-CHG-05 | US-11 | TC-CHG-05 Given a lease starting 2026-11-16 at 1,200.00, when November is charged, then the charge is 600.00 (15 of 30 days) due on the start date | `tests/db/charges.test.ts:123` |
+| TC-CHG-05 | US-11 | TC-CHG-05 Given a lease starting 2026-11-16 at 1,200.00, when November is generated, then the charge is 600.00, marked as prorated | `e2e/charges.spec.ts:41` |
+| TC-CHG-06 | US-11 | TC-CHG-06 Given a lease starting on the 1st, when the first month is charged, then the charge is the full rent | `tests/db/charges.test.ts:129` |
+| TC-CHG-07 | US-10 | TC-CHG-07 Given an active lease with due day 5, when I generate 2026-12, then the due date is 2026-12-05 | `tests/db/charges.test.ts:68` |
 | TC-DEP-01 | US-17 | TC-DEP-01 Given a draft lease, when I record a deposit of 1,200.00 received 2026-10-25, then it appears in the deposit section | `tests/db/leases.test.ts:151` |
 | TC-DEP-01 | US-17 | TC-DEP-01 Given a draft lease, when I record a deposit of 1,200.00 received 2026-10-25, then it appears in the deposit section | `e2e/leases.spec.ts:99` |
 | TC-DEP-02 | US-17 | TC-DEP-02 Given a deposit paid in two instalments of 600.00, when I record both, then the deposit held is 1,200.00 | `tests/db/leases.test.ts:160` |
@@ -127,7 +138,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:104` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (44): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-05, TC-CHG-06, TC-CHG-07, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (37): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -148,5 +159,5 @@ UAT cases with no automated test yet (44): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 26 of 70
+- UAT cases with an automated test: 33 of 70
 - Link errors: 0

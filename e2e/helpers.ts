@@ -74,3 +74,19 @@ export async function createDraftLease(page: Page, l: Parameters<typeof fillLeas
   await page.getByRole("button", { name: "Save lease" }).click();
   await expect(page.getByTestId("lease-status")).toHaveText("Draft");
 }
+
+/** Draft lease → deposit → active, through the UI. */
+export async function createActiveLease(page: Page, l: Parameters<typeof fillLease>[1] = {}) {
+  await createDraftLease(page, l);
+  const deposit = page.getByRole("region", { name: "Deposit" });
+  await deposit.getByLabel("Amount").fill("1,200.00");
+  await deposit.getByRole("button", { name: "Record and activate" }).click();
+  await expect(page.getByTestId("lease-status")).toHaveText("Active");
+  return page.url();
+}
+
+export async function generateCharges(page: Page, month: string) {
+  await page.goto("/charges");
+  await page.getByLabel("Month").fill(month);
+  await page.getByRole("button", { name: "Generate rent" }).click();
+}
