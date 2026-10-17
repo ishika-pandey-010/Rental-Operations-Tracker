@@ -8,6 +8,8 @@ const LINKS = [
   { href: "/tenants", label: "Tenants" },
   { href: "/leases", label: "Leases" },
   { href: "/charges", label: "Charges" },
+  { href: "/reports/overdue", label: "Overdue" },
+  { href: "/reports/refunds", label: "Refunds" },
 ];
 
 export function Nav() {
