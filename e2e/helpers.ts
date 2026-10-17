@@ -135,3 +135,18 @@ export async function addDeductionUI(page: Page, amount: string, reason: string)
   await deposit.getByLabel("Reason").fill(reason);
   await deposit.getByRole("button", { name: "Add deduction" }).click();
 }
+
+/** Presses Tab until the focused element's accessible text matches, then returns. Fails after 150 presses. */
+export async function tabTo(page: Page, matcher: RegExp) {
+  for (let i = 0; i < 150; i++) {
+    await page.keyboard.press("Tab");
+    const text = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return "";
+      const label = el.id ? document.querySelector(`label[for="${el.id}"]`)?.textContent : "";
+      return `${el.getAttribute("aria-label") ?? ""} ${label ?? ""} ${el.textContent ?? ""}`.trim();
+    });
+    if (matcher.test(text)) return;
+  }
+  throw new Error(`Never reached an element matching ${matcher} with Tab`);
+}

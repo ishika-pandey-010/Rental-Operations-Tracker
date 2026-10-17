@@ -26,8 +26,8 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-16 | Must | Calculate the refund as deposit − deductions and track its status (… | US-19 | TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08 | 4 of 4 | R-07 |
 | FR-17 | Must | Record an early move-out: set the move-out date, prorate the final… | US-09 | TC-LEASE-12, TC-LEASE-13, TC-LEASE-14 | 3 of 3 | R-05 |
 | FR-18 | Should | Renew a lease as a new lease linked to the old one; the deposit can… | US-08 | TC-LEASE-10, TC-LEASE-11 | 0 of 2 | — |
-| FR-19 | Must | Overdue rent report: every charge past due with a balance, and days… | US-20 | TC-RPT-01, TC-RPT-02, TC-RPT-03 | 0 of 3 | — |
-| FR-20 | Must | Pending refunds report: every ended lease whose refund is not paid. | US-21 | TC-RPT-04, TC-RPT-05 | 0 of 2 | — |
+| FR-19 | Must | Overdue rent report: every charge past due with a balance, and days… | US-20 | TC-RPT-01, TC-RPT-02, TC-RPT-03 | 3 of 3 | — |
+| FR-20 | Must | Pending refunds report: every ended lease whose refund is not paid. | US-21 | TC-RPT-04, TC-RPT-05 | 2 of 2 | — |
 | FR-21 | Must | Lease ledger view: charges, payments, allocations and running balan… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
 | FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 0 of 1 | — |
 | FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 0 of 1 | — |
@@ -36,7 +36,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | NFR-03 | Must | Every table has RLS enabled; an automated test proves user B cannot… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
 | NFR-04 | Must | Balances and statuses are derived from ledger rows, never stored by… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
 | NFR-05 | Must | Every ledger row records who created it and when. | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 3 of 3 | — |
-| NFR-06 | Should | Core flows are usable with keyboard only and meet WCAG 2.2 AA colou… | — | TC-NFR-05 | 0 of 1 | — |
+| NFR-06 | Should | Core flows are usable with keyboard only and meet WCAG 2.2 AA colou… | — | TC-NFR-05 | 1 of 1 | — |
 | NFR-07 | Should | Ledger and report pages load in under 2 s with 20 units and 24 mont… | — | TC-NFR-07 | 0 of 1 | — |
 | NFR-08 | Should | Works in current Chrome, Firefox, Safari and Edge, desktop and phon… | — | TC-NFR-09 | 0 of 1 | — |
 | NFR-09 | Must | A seed script rebuilds a realistic demo account in one command (the… | — | TC-NFR-06 | 0 of 1 | — |
@@ -66,8 +66,8 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:16`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-18 | Deposit deductions | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:162`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
 | US-19 | Refund or amount owed | S3 | `src/app/(app)/leases/[id]/settlement.tsx:2`<br>`src/app/(app)/leases/actions.ts:177`<br>`supabase/migrations/20261018100000_charges.sql:4`<br>`supabase/migrations/20261018140000_deposit_settlement.sql:1` |
-| US-20 | Overdue rent | S3 | — |
-| US-21 | Pending refunds | S3 | — |
+| US-20 | Overdue rent | S3 | `src/app/(app)/reports/overdue/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
+| US-21 | Pending refunds | S3 | `src/app/(app)/reports/refunds/page.tsx:20`<br>`supabase/migrations/20261018150000_reports.sql:1` |
 | US-22 | CSV export | S3 | — |
 | US-23 | Dashboard | S3 | `src/app/(app)/page.tsx:14` |
 
@@ -172,6 +172,16 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-DEP-07 | US-19 | TC-DEP-07 Given a refund due of 1,050.00, when anyone saves a refund of 1,100.00 by SQL, then the database rejects it | `tests/db/deposits.test.ts:100` |
 | TC-DEP-08 | US-19 | TC-DEP-08 Given a pending refund of 1,050.00, when I mark it paid on 2027-03-01, then it's paid with that date | `tests/db/deposits.test.ts:109` |
 | TC-DEP-08 | US-19 | TC-DEP-08 Given a pending refund of 1,050.00, when I mark it paid on 2027-03-01, then it shows as paid on that date and deductions close | `e2e/deposits.spec.ts:37` |
+| TC-RPT-01 | US-20 | TC-RPT-01 Given a charge due 2026-12-01 with balance 700.00 and today 2026-12-11, when I open Overdue, then it shows tenant, unit, 700.00 and 10 days | `tests/db/reports.test.ts:35` |
+| TC-RPT-01 | US-20 | TC-RPT-01 Given a charge due 2026-12-01 with 700.00 left and today 2026-12-11, when I open Overdue, then the row shows tenant, unit, 700.00 and 10 days | `e2e/reports.spec.ts:15` |
+| TC-RPT-02 | US-20 | TC-RPT-02 Given a charge that's fully paid, when I open Overdue, then it doesn't appear | `tests/db/reports.test.ts:44` |
+| TC-RPT-02 | US-20 | TC-RPT-02 Given a charge that's fully paid, when I open Overdue, then it isn't listed | `e2e/reports.spec.ts:29` |
+| TC-RPT-03 | US-20 | TC-RPT-03 Given a charge not yet due, or due today, when I open Overdue, then it doesn't appear (overdue from the day after, OQ-05) | `tests/db/reports.test.ts:51` |
+| TC-RPT-03 | US-20 | TC-RPT-03 Given a charge not yet due, when I open Overdue, then it isn't listed | `e2e/reports.spec.ts:37` |
+| TC-RPT-04 | US-21 | TC-RPT-04 Given a lease ended 2027-02-10 with a pending refund, when I open Pending refunds, then it's listed with the amount and days since end | `tests/db/reports.test.ts:89` |
+| TC-RPT-04 | US-21 | TC-RPT-04 Given a lease ended 2027-02-10 with a pending refund, when I open Pending refunds, then it's listed with the amount and days since end | `e2e/reports.spec.ts:45` |
+| TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease isn't listed | `tests/db/reports.test.ts:97` |
+| TC-RPT-05 | US-21 | TC-RPT-05 Given the refund is marked paid, when I open Pending refunds, then the lease no longer appears | `e2e/reports.spec.ts:56` |
 | TC-NFR-01 | US-02 | TC-NFR-01 Given landlords A and B each have a property, when B lists properties, then B sees only B's property | `tests/db/rls.test.ts:41` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease through the API, then no row is returned | `tests/api/isolation.test.ts:45` |
 | TC-NFR-02 | US-02 | TC-NFR-02 Given A's lease ID, when B requests that lease directly, then no row is returned | `tests/db/rls.test.ts:62` |
@@ -179,9 +189,10 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-03 | US-02 | TC-NFR-03 Given A's lease ID, when B tries to record a deposit against it, then the insert is rejected | `tests/db/rls.test.ts:67` |
 | TC-NFR-04 | US-02 | TC-NFR-04 Given every table in the schema, when the RLS suite runs, then each has RLS enabled and an owner_id column | `tests/db/rls.test.ts:92` |
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:104` |
+| TC-NFR-05 | NFR-06 | TC-NFR-05 Given a seeded lease, when I generate charges, record a payment and open Overdue using only the keyboard, then every step works and focus is always visible | `e2e/reports.spec.ts:66` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (15): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (9): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-RPT-06, TC-RPT-07, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -202,5 +213,5 @@ UAT cases with no automated test yet (15): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 55 of 70
+- UAT cases with an automated test: 61 of 70
 - Link errors: 0
