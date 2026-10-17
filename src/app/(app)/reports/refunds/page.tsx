@@ -29,6 +29,11 @@ export default async function RefundsPage({ searchParams }: { searchParams: Prom
     <>
       <div className="page-head">
         <h1>Pending refunds</h1>
+        {rows.length > 0 && (
+          <a className="button secondary" href={`/reports/refunds.csv?as_of=${asOf}`}>
+            Export CSV
+          </a>
+        )}
       </div>
       <p className="muted">Ended leases where you still hold a deposit and haven&apos;t recorded the refund.</p>
       <AsOfForm asOf={asOf} action="/reports/refunds" />

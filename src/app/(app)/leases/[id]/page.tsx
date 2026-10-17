@@ -125,9 +125,16 @@ export default async function LeasePage({
           </section>
 
           <section className="card" aria-labelledby="ledger-h">
-            <h2 id="ledger-h" style={{ marginTop: 0 }}>
-              Ledger
-            </h2>
+            <div className="page-head">
+              <h2 id="ledger-h" style={{ marginTop: 0 }}>
+                Ledger
+              </h2>
+              {ledger.length > 0 && (
+                <a className="button secondary" href={`/leases/${lease.id}/ledger.csv`} aria-label="Export ledger as CSV">
+                  Export CSV
+                </a>
+              )}
+            </div>
             <LedgerTable rows={ledger} userId={auth.user?.id ?? ""} leaseId={lease.id} reversed={reversed} today={today} />
           </section>
         </>
