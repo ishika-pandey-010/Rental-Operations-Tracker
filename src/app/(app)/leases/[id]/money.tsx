@@ -5,6 +5,8 @@ import { ReverseForm } from "./reverse-form";
 
 export type ChargeBalance = {
   charge_id: string;
+  kind: "rent" | "deposit_shortfall";
+  period: string | null;
   description: string;
   due_date: string;
   value_cents: number;
