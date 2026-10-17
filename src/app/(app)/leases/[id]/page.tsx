@@ -9,6 +9,7 @@ import { ActivateButton, DepositForm, WaiverForm } from "../forms";
 import { ChargesTable, LedgerTable, type ChargeBalance, type LedgerRow } from "./money";
 import { PaymentForm } from "./payment-form";
 import { MoveOutForm } from "./move-out-form";
+import { DeductionForm, RefundForm } from "./settlement";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -40,6 +41,14 @@ export default async function LeasePage({
       supabase.from("payments").select("method").eq("lease_id", id).order("created_at", { ascending: false }).limit(1).maybeSingle(),
       supabase.auth.getUser(),
     ]);
+  const [{ data: refund }, { data: deductions }] = await Promise.all([
+    supabase
+      .from("lease_refund_status")
+      .select("held_cents, deductions_cents, refund_due_cents, owed_cents, status, paid_on, refunded_cents")
+      .eq("lease_id", id)
+      .single(),
+    supabase.from("deposit_deductions").select("id, amount_cents, reason, created_at").eq("lease_id", id).order("created_at"),
+  ]);
   const { data: reversedRows } = await supabase.from("payment_balances").select("payment_id").eq("lease_id", id).eq("reversed", true);
   const reversed = new Set((reversedRows ?? []).map((r) => r.payment_id as string));
   const charges = (chargeData ?? []) as ChargeBalance[];
@@ -185,6 +194,62 @@ export default async function LeasePage({
           <p className="alert warn">
             Deposit waived on {lease.deposit_waived_on}: {lease.deposit_waiver_reason}
           </p>
+        )}
+        {lease.status === "ended" && refund && (
+          <>
+            <h3>Deductions</h3>
+            {deductions && deductions.length > 0 ? (
+              <div className="table-wrap">
+                <table aria-label="Deductions">
+                  <thead>
+                    <tr>
+                      <th scope="col">Reason</th>
+                      <th scope="col" className="num">
+                        Amount
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {deductions.map((d) => (
+                      <tr key={d.id}>
+                        <td>{d.reason}</td>
+                        <td className="num">{formatMoney(d.amount_cents)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="muted">No deductions. Add any amount you&apos;re keeping, with the reason the tenant will see.</p>
+            )}
+            {refund.status !== "paid" && <DeductionForm leaseId={lease.id} hideOk={Boolean(done)} />}
+
+            <h3>Refund</h3>
+            <p>
+              Refund due: <strong data-testid="refund-due">{formatMoney(refund.refund_due_cents)}</strong>{" "}
+              <span className="muted">
+                ({formatMoney(refund.held_cents)} held − {formatMoney(refund.deductions_cents)} deductions)
+              </span>{" "}
+              <span className={`badge ${refund.status === "paid" ? "paid" : "pending"}`} data-testid="refund-status">
+                {refund.status === "paid" ? "Paid" : refund.status === "nothing_held" ? "Nothing held" : "Pending"}
+              </span>
+            </p>
+            {refund.owed_cents > 0 && (
+              <p className="alert warn">
+                Deductions are {formatMoney(refund.owed_cents)} more than the deposit. That amount has been charged to the tenant as
+                &quot;Deductions above deposit&quot; and shows under Charges.
+              </p>
+            )}
+            {refund.status === "paid" ? (
+              <p className="alert ok">
+                Refund of {formatMoney(refund.refunded_cents)} paid on {refund.paid_on}.
+              </p>
+            ) : refund.status === "pending" ? (
+              <RefundForm leaseId={lease.id} dueCents={refund.refund_due_cents} today={today} />
+            ) : (
+              <p className="muted">No deposit was held on this lease, so there&apos;s nothing to refund.</p>
+            )}
+          </>
         )}
         {lease.status !== "ended" && <DepositForm hideOk={Boolean(done)} leaseId={lease.id} today={today} suggested={centsToInput(rent[0]?.monthly_rent_cents)} canActivate={lease.status === "draft"} />}
         {lease.status === "draft" && !lease.deposit_waived_on && (deposits?.length ?? 0) === 0 && (

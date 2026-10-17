@@ -158,3 +158,34 @@ export async function recordMoveOut(_prev: FormState, formData: FormData): Promi
   done(values.lease_id, `Move-out on ${values.move_out_date} recorded. The lease has ended.`);
   return {};
 }
+
+// US-18 Deposit deductions
+export async function addDeduction(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "amount", "reason"]);
+  const amount = positiveAmount(values.amount, "deduction");
+  if ("error" in amount) return fail(amount.error, values);
+  if (!values.reason) return fail("Add a reason", values);
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("deposit_deductions")
+    .insert({ lease_id: values.lease_id, amount_cents: amount.cents, reason: values.reason });
+  if (error) return fail(dbErrorMessage(error), values);
+  revalidatePath(`/leases/${values.lease_id}`);
+  return succeed(`Deduction of ${formatMoney(amount.cents)} added`);
+}
+
+// US-19 Mark the refund paid
+export async function payRefund(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "amount_cents", "paid_on"]);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("pay_refund", {
+    p_lease_id: values.lease_id,
+    p_amount_cents: Number(values.amount_cents),
+    p_paid_on: values.paid_on,
+  });
+  if (error) return fail(dbErrorMessage(error), values);
+  revalidatePath(`/leases/${values.lease_id}`);
+  revalidatePath("/reports/refunds");
+  done(values.lease_id, `Refund of ${formatMoney(values.amount_cents)} marked paid`);
+  return {};
+}

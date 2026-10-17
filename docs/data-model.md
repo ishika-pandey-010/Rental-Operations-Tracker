@@ -39,8 +39,8 @@ All tables have `id uuid`, `owner_id uuid default auth.uid()`, `created_at`, `cr
 | `payment_reversals` | payment_id (unique), reason, reversed_on | One reversal per payment. An after-insert trigger releases everything the payment paid with negative allocation rows, however the reversal was written, then lets other credit fill the reopened charges. A reversed payment can't be allocated again | FR-13 |
 | `payment_allocations` | payment_id, charge_id, amount_cents (±) | Trigger: net allocations to a charge ≤ its adjusted amount, and net allocations from a payment ≤ the payment. Negative rows release money back to credit | FR-11, FR-12 |
 | `deposits` | lease_id, amount_cents, received_on | One row per instalment; deposit held = sum | FR-14 |
-| `deposit_deductions` | lease_id, amount_cents, reason | `reason` NOT NULL and not blank | FR-15 |
-| `refunds` | lease_id (unique), amount_cents, status, paid_on | Trigger: `amount_cents = max(0, deposits − deductions)`; excess becomes a `deposit_shortfall` charge | FR-16 |
+| `deposit_deductions` | lease_id, amount_cents, reason | `reason` NOT NULL and not blank; only on an ended lease and before the refund is paid. An after-insert trigger charges any part of the deductions above the deposit that isn't charged yet as a `deposit_shortfall` charge, then applies credit | FR-15, FR-16 |
+| `refunds` | lease_id (unique), amount_cents, paid_on | One row, written when the refund is paid, never edited (D-20). Trigger: the lease has ended and `amount_cents = max(0, deposit held − deductions)`. `pending` is derived in `lease_refund_status` | FR-16 |
 
 **Append-only.** `charges`, `charge_adjustments`, `payments`, `payment_reversals`, `payment_allocations`, `deposits` and `deposit_deductions` have no `UPDATE` or `DELETE` policy, and a trigger rejects both (NFR-02). Mistakes are fixed with an adjustment, reversal or negative allocation.
 
@@ -56,6 +56,7 @@ Nothing below is stored. Each is a SQL view so the numbers can't drift from the 
 | `lease_credit` | per lease: payments not reversed − net allocations | Ledger, credit auto-apply |
 | `lease_ledger` | charges, adjustments, payments, reversals in date order with a running balance (positive = tenant owes). Allocation rows show where each payment went ("Applied to…", "Credit applied to…") and don't move the balance | US-16 |
 | `overdue_rent` | charges past due with balance > 0, days overdue | US-20 |
+| `lease_refund_status` | per lease: held, deductions, refund due, amount owed above the deposit, status (`not_due`, `pending`, `nothing_held`, `paid`), paid on | Lease page, US-21 |
 | `pending_refunds` | ended leases with refund status ≠ `paid`, days since end | US-21 |
 
 ## Money rules, worked

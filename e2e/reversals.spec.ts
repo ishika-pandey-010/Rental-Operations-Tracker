@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 test("TC-PAY-10 Given a 1,200.00 payment allocated to December, when I reverse it with reason 'bounced', then December's balance is 1,200.00 again and the payment shows as reversed", async ({ page }) => {
   await leaseWithCharges(page, ["2026-12"]);
   await recordPaymentUI(page, { amount: "1,200.00", paidOn: "2026-12-02", reference: "TRX-881" });
-  await expect(statusIn(page)).toBeVisible();
+  await expect(statusIn(page)).toHaveText("Payment of $1,200.00 recorded");
   const ledger = page.getByRole("region", { name: "Ledger" });
   const row = ledger.getByRole("row", { name: /TRX-881/ });
   await row.getByText("Reverse…").click();
@@ -28,7 +28,7 @@ test("TC-PAY-10 Given a 1,200.00 payment allocated to December, when I reverse i
 test("Given I try to reverse a payment without a reason, when I submit, then I'm asked for one and nothing changes", async ({ page }) => {
   await leaseWithCharges(page, ["2026-12"]);
   await recordPaymentUI(page, { amount: "500", reference: "R1" });
-  await expect(statusIn(page)).toBeVisible();
+  await expect(statusIn(page)).toHaveText("Payment of $500.00 recorded");
   const row = page.getByRole("region", { name: "Ledger" }).getByRole("row", { name: /R1/ });
   await row.getByText("Reverse…").click();
   await row.getByLabel("Reason").fill("   ");
