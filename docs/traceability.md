@@ -37,9 +37,9 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | NFR-04 | Must | Balances and statuses are derived from ledger rows, never stored by… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
 | NFR-05 | Must | Every ledger row records who created it and when. | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 3 of 3 | — |
 | NFR-06 | Should | Core flows are usable with keyboard only and meet WCAG 2.2 AA colou… | — | TC-NFR-05 | 1 of 1 | — |
-| NFR-07 | Should | Ledger and report pages load in under 2 s with 20 units and 24 mont… | — | TC-NFR-07 | 0 of 1 | — |
+| NFR-07 | Should | Ledger and report pages load in under 2 s with 20 units and 24 mont… | — | TC-NFR-07 | 1 of 1 | — |
 | NFR-08 | Should | Works in current Chrome, Firefox, Safari and Edge, desktop and phon… | — | TC-NFR-09 | 0 of 1 | — |
-| NFR-09 | Must | A seed script rebuilds a realistic demo account in one command (the… | — | TC-NFR-06 | 0 of 1 | — |
+| NFR-09 | Must | A seed script rebuilds a realistic demo account in one command (the… | — | TC-NFR-06 | 1 of 1 | — |
 
 ## Story → code
 
@@ -201,9 +201,11 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-04 | US-02 | TC-NFR-04 Given every table in the schema, when the RLS suite runs, then each has RLS enabled and an owner_id column | `tests/db/rls.test.ts:92` |
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:104` |
 | TC-NFR-05 | NFR-06 | TC-NFR-05 Given a seeded lease, when I generate charges, record a payment and open Overdue using only the keyboard, then every step works and focus is always visible | `e2e/reports.spec.ts:66` |
+| TC-NFR-06 | NFR-09 | TC-NFR-06 Given any database state, when I run the seed, then the demo landlord can sign in and has properties, leases and 12+ months of history, the same on a second run | `tests/api/seed.test.ts:11` |
+| TC-NFR-07 | NFR-07 | TC-NFR-07 (local proxy) Given the seeded demo (20 units, ~24 months), when I open a lease ledger and both reports, then each loads in under 2 seconds | `e2e/performance.spec.ts:12` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (3): TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (1): TC-NFR-09.
 
 ## UAT sheet status
 
@@ -224,5 +226,5 @@ UAT cases with no automated test yet (3): TC-NFR-06, TC-NFR-07, TC-NFR-09.
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 67 of 70
+- UAT cases with an automated test: 69 of 70
 - Link errors: 0

@@ -1,4 +1,4 @@
-.PHONY: help docs docs-check setup env run test e2e db seed check
+.PHONY: help docs docs-check setup env run test e2e db seed seed-user-test baseline check
 
 help:
 	@echo "make docs        rebuild docs/traceability.md and check every ID links up"
@@ -9,13 +9,17 @@ help:
 	@echo "make test        vitest: unit, database and API tests (needs local Supabase)"
 	@echo "make e2e         playwright end-to-end tests (needs local Supabase)"
 	@echo "make seed        rebuild the demo account (demo@rentalops.test / demo-pass-2026)"
+	@echo "make seed-user-test  rebuild the three-unit account the timed user test starts from"
+	@echo "make baseline    rewrite docs/user-test/baseline.xlsx (the spreadsheet starting state)"
 	@echo "make check       everything CI runs: docs, types, tests, e2e"
 
 docs:
 	python3 scripts/docs_check.py
+	python3 scripts/results.py
 
 docs-check:
 	python3 scripts/docs_check.py --check
+	python3 scripts/results.py --check
 
 setup:
 	npm ci
@@ -39,6 +43,12 @@ e2e:
 
 seed:
 	node scripts/seed.mjs
+
+seed-user-test:
+	node scripts/seed.mjs --user-test
+
+baseline:
+	python3 scripts/make_baseline_xlsx.py
 
 check: docs-check
 	npx tsc --noEmit

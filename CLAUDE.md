@@ -52,17 +52,13 @@ Code folders (`src/`, `supabase/migrations/`, `tests/`, `e2e/`) arrive in S1.
 ## Commands
 
 ```text
-make docs    rebuild docs/traceability.md and check every ID (run after any docs change)
-```
-
-From S1:
-
-```text
-make setup   install deps, start local Supabase
-make run     next dev
-make test    vitest (unit + database tests)
-make e2e     playwright
-make db      apply migrations to local Supabase
+make docs    rebuild docs/traceability.md and the README Results, check every ID (run after any docs change)
+make setup   install deps, start local Supabase, write .env.local
+make run     next dev on :3100
+make test    vitest (unit, database and API tests; needs local Supabase)
+make e2e     playwright (builds and serves the app on :3100)
+make db      rebuild the local database from supabase/migrations
+make seed    rebuild the demo account (make seed-user-test for the user-test account)
 ```
 
 ## IDs and traceability (the core PM rule)
@@ -107,4 +103,4 @@ make db      apply migrations to local Supabase
 
 ## Current status
 
-S1 and S2 done on `dev` (tags `s1`, `s2`); S3 (deposits, reports) in progress. S0 discovery has not run (D-16). See `docs/sprint-plan.md`, `docs/feature-map.md` and `docs/open-questions.md`.
+S1–S3 built on `dev` (tags `s1`, `s2`, `s3`); every story US-01 to US-23 passes its automated tests. Not released: discovery, UAT on a hosted demo and the timed user test need people and hosted accounts (OQ-16 to OQ-18). See `docs/sprint-plan.md`, `docs/feature-map.md` and `docs/open-questions.md`.

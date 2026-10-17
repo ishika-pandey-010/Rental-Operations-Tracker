@@ -22,7 +22,7 @@ Three units, one month. Each participant must:
 
 | | Spreadsheet | App |
 | --- | --- | --- |
-| Starting state | `docs/user-test/baseline.xlsx`: the three units, tenants and October already filled in | Seeded account with the same units, tenants and October |
+| Starting state | `docs/user-test/baseline.xlsx`: the three units, tenants and October already filled in (`make baseline` rewrites it) | `make seed-user-test`: `usertest@rentalops.test` with the same units, tenants and October (run before each session; it resets the account) |
 | Preparation | None (they know spreadsheets) | 10-minute walkthrough using `docs/user-guide.md`, then no help |
 | Order | Alternate: P1, P3, P5 start with the spreadsheet; P2, P4 start with the app | |
 
