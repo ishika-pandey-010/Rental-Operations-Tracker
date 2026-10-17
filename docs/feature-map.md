@@ -5,9 +5,9 @@ One row per feature, in build order. The user is the self-managing landlord from
 | Story | Feature | The job the landlord is doing | Acceptance criteria (short) | Priority | Sprint | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | US-01 | Sign up and sign in | Get a private account and come back to it | Sign up lands on the home page; wrong password says "Email or password is incorrect"; signed out, every app page redirects to sign-in and returns to the page asked for | Must | S1 | done |
-| US-02 | My data stays mine | Trust that nobody else sees tenant or money records | B can't list, read or write A's rows through the API; every table has RLS and a cross-account test | Must | S1 | not started |
-| US-03 | Properties and units | Put each real place into the app once | Add "12 Elm St" with units A and B in one form; duplicate label refused; unit with an active lease can't be archived | Must | S1 | not started |
-| US-04 | Tenants | Know who to call about a balance | Tenant needs a name and a phone or email; "Add a phone number or email" otherwise | Must | S1 | not started |
+| US-02 | My data stays mine | Trust that nobody else sees tenant or money records | B can't list, read or write A's rows through the API; every table has RLS and a cross-account test | Must | S1 | in progress |
+| US-03 | Properties and units | Put each real place into the app once | Add "12 Elm St" with units A and B in one form; duplicate label refused; unit with an active lease can't be archived | Must | S1 | in progress |
+| US-04 | Tenants | Know who to call about a balance | Tenant needs a name and a phone or email; "Add a phone number or email" otherwise | Must | S1 | in progress |
 | US-05 | Create a lease | Record who rents which unit, for how much, from when | New lease saves as `draft`; end before start refused; no two overlapping active leases on a unit | Must | S1 | not started |
 | US-06 | Deposit gate | Never activate a lease and forget the deposit | Activate without deposit or waiver says "Record a deposit or a waiver first"; works with either; a direct SQL update is refused too | Must | S1 | not started |
 | US-17 | Record a deposit | Keep deposit money apart from rent | Deposit shows in its own section, not the rent ledger; instalments add up | Must | S1 | not started |
