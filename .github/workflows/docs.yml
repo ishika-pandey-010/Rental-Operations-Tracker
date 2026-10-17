@@ -16,3 +16,5 @@ jobs:
         run: |
           python3 scripts/docs_check.py
           git diff --exit-code docs/traceability.md || (echo "Run 'make docs' and commit docs/traceability.md" && exit 1)
+      - name: README Results are generated, not typed
+        run: python3 scripts/results.py --check

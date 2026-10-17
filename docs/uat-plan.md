@@ -63,7 +63,20 @@ Lifecycle: `Open → In progress → Fixed → Verified (re-run the case) → Cl
 
 Bug fields (Jira, mirrored in the GitHub bug template): ID, TC ID, story, severity, steps, expected, actual, screenshot, environment, fixed in commit, verified on.
 
-## 8. Sign-off
+## 8. Readiness (2026-10-18)
+
+Entry criteria from §5, as they stand at the end of the build:
+
+| Entry criterion | State |
+| --- | --- |
+| All S1–S3 stories merged | Done on `dev` (tags `s1`, `s2`, `s3`). Not yet on `main` |
+| Automated tests green | 69 of 70 UAT cases have an automated test (see [traceability](traceability.md#coverage)); all pass locally and in CI. TC-NFR-09 (real Safari and Edge) can only be run by hand |
+| Demo deployed and seeded | Not done: needs Vercel and Supabase accounts (OQ-16). `make seed` builds the demo data in one command once a database exists |
+| UAT sheet reviewed | Not done: needs the product owner |
+
+An automated pass is evidence the case is likely to pass, not a UAT result. Every row keeps `Not run` until a person executes it on the hosted demo.
+
+## 9. Sign-off
 
 | Role | Name | Date | Result |
 | --- | --- | --- | --- |

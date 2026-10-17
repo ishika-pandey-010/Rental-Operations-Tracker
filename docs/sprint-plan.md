@@ -21,7 +21,7 @@ S1 is lighter on points because it also carries one-off setup: repo scaffold, lo
 | --- | --- | --- | --- |
 | 1 | Five discovery conversations (guide in [discovery-notes.md](discovery-notes.md)) | Notes per person; P1–P5 confirmed or cut | [ ] |
 | 2 | Answer PRD open questions Q1–Q2 | Answers in PRD §11; decisions logged | [ ] |
-| 3 | Build the baseline spreadsheet for the timed task | `docs/user-test/baseline.xlsx` | [ ] |
+| 3 | Build the baseline spreadsheet for the timed task | `docs/user-test/baseline.xlsx` (built in S3 by `make baseline`) | [x] |
 | 4 | Book five (aim for seven) test users for S3 | Names and slots, kept private (not in git) | [ ] |
 | 5 | Backlog refinement: point every story, confirm sprint split | Points in user-stories.md | [x] |
 | 6 | Set up Jira board: epics E1–E7, stories, S1 sprint | Board link in README | [ ] |
@@ -143,4 +143,11 @@ Filled in at the end of each sprint. Planned vs done points come from the Jira s
 - Retro, change: three of my end-to-end failures this sprint were helpers that clicked and moved on without waiting for the result. Helpers that submit now wait for the confirmation.
 
 ### S3 review
-- Planned: 21 pts · Done: [TBD]
+- Planned: 21 pts + UAT · Done: 21 pts (US-07, US-08, US-18 to US-23, including the Shoulds US-08 and US-22 and the Could US-23), plus NFR-09 (seed), the user guide, and the user-test starting states. Not done: the UAT run and the timed user test, which need people and a hosted demo (OQ-16, OQ-18).
+- Dates: built 2026-10-18, the same session as S1 and S2.
+- Tests at the end of S3: 214 Vitest (unit, database, API) in 23 files and 79 Playwright, all passing locally. 69 of the 70 UAT cases have an automated test; TC-NFR-09 (Safari and Edge) is manual (OQ-23).
+- Release gate (CLAUDE.md, v1): all Must FRs done (yes); UAT exit criteria met (no, UAT not run); README Results generated (yes, and they say "not run"). v1 is not releasable yet, so nothing has been merged to `main`.
+- Bugs found by my own review and tests this sprint, fixed before merge: none in the app beyond the S2 Charges-page one. The failures were my tests: loose waits on a confirmation that was already on screen (fixed in seven places), a label regex that missed the amount in the label, and a dashboard test that assumed a date.
+- Risks changed: R-07 now has passing automated proving tests (TC-DEP-06, TC-DEP-07). Every product risk R-01 to R-09 has one; all stay open until UAT. R-11 (paused free database) has its mitigation built: `make seed`. R-15 is unchanged until discovery runs.
+- Retro, keep: generated docs (traceability, Results) meant the "where's the proof" question had one answer that couldn't drift.
+- Retro, change: several S3 end-to-end tests were written against dates without thinking about when they'd run. Tests that touch "today" now build their data around today (dashboard) or pass an explicit `as_of` (reports).
