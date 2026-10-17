@@ -4,7 +4,7 @@ One row per feature, in build order. The user is the self-managing landlord from
 
 | Story | Feature | The job the landlord is doing | Acceptance criteria (short) | Priority | Sprint | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| US-01 | Sign up and sign in | Get a private account and come back to it | Sign up lands on the home page; wrong password says "Email or password is incorrect"; signed out, every app page redirects to sign-in and returns to the page asked for | Must | S1 | not started |
+| US-01 | Sign up and sign in | Get a private account and come back to it | Sign up lands on the home page; wrong password says "Email or password is incorrect"; signed out, every app page redirects to sign-in and returns to the page asked for | Must | S1 | done |
 | US-02 | My data stays mine | Trust that nobody else sees tenant or money records | B can't list, read or write A's rows through the API; every table has RLS and a cross-account test | Must | S1 | not started |
 | US-03 | Properties and units | Put each real place into the app once | Add "12 Elm St" with units A and B in one form; duplicate label refused; unit with an active lease can't be archived | Must | S1 | not started |
 | US-04 | Tenants | Know who to call about a balance | Tenant needs a name and a phone or email; "Add a phone number or email" otherwise | Must | S1 | not started |
