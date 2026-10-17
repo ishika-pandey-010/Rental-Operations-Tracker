@@ -17,7 +17,7 @@ One row per feature, in build order. The user is the self-managing landlord from
 | US-12 | Record a payment | Make the app match the bank | Payment shows with who recorded it and when; repeated reference refused; zero or negative refused | Must | S2 | done |
 | US-13 | Partial payments | See what's still owed after a part-payment | 500.00 against 1,200.00 leaves 700.00 `partial`; default allocation is oldest first; manual override; database refuses over-allocation | Must | S2 | done |
 | US-14 | Overpayment becomes credit | Let extra money pay next month | 1,500.00 against 1,200.00 leaves 300.00 credit; it's applied to January when January is charged, shown as a ledger row | Must | S2 | done |
-| US-15 | Reverse a bounced payment | Undo a payment without losing history | Reversal reopens the charge and keeps the payment visible as reversed; SQL delete refused | Should | S2 | not started |
+| US-15 | Reverse a bounced payment | Undo a payment without losing history | Reversal reopens the charge and keeps the payment visible as reversed; SQL delete refused | Should | S2 | done |
 | US-16 | Lease ledger | Answer "what do I owe?" from one page | Every row in date order with a running balance that ties to the charge balances minus credit | Must | S2 | done |
 | US-07 | Change rent mid-lease | Raise the rent without rewriting old bills | New rent from 2027-01 leaves Nov and Dec at 1,200.00; an already-charged month is refused with "January is already charged; choose a later month" | Must | S3 | not started |
 | US-18 | Deposit deductions | Say what's being kept from the deposit and why | Deduction needs a reason ("Add a reason"); refund due drops by the deduction | Must | S3 | not started |

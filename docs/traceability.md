@@ -20,7 +20,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-10 | Must | Record a payment with date, amount, method and reference. A referen… | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 3 of 3 | — |
 | FR-11 | Must | Allocate a payment to open charges, oldest first by default, with m… | US-13 | TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07 | 4 of 4 | R-02 |
 | FR-12 | Must | Hold any unallocated amount as credit and apply it to the next open… | US-14 | TC-PAY-08, TC-PAY-09 | 2 of 2 | R-08 |
-| FR-13 | Should | Reverse a payment (for example a bounced transfer) without deleting… | US-15 | TC-PAY-10, TC-PAY-11 | 0 of 2 | R-06 |
+| FR-13 | Should | Reverse a payment (for example a bounced transfer) without deleting… | US-15 | TC-PAY-10, TC-PAY-11 | 2 of 2 | R-06 |
 | FR-14 | Must | Record a deposit received (full or in instalments) against a lease,… | US-17 | TC-DEP-01, TC-DEP-02 | 2 of 2 | — |
 | FR-15 | Must | Record deposit deductions with an amount and a reason. | US-18 | TC-DEP-03, TC-DEP-04 | 0 of 2 | — |
 | FR-16 | Must | Calculate the refund as deposit − deductions and track its status (… | US-19 | TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08 | 0 of 4 | R-07 |
@@ -32,7 +32,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 | FR-22 | Should | Export the lease ledger and both reports as CSV. | US-22 | TC-RPT-06 | 0 of 1 | — |
 | FR-23 | Could | Dashboard: units occupied, rent due this month, total overdue, depo… | US-23 | TC-RPT-07 | 0 of 1 | — |
 | NFR-01 | Must | Money is stored as integer minor units. No floating-point arithmeti… | — | TC-NFR-08 | 1 of 1 | R-05 |
-| NFR-02 | Must | Ledger rows (charges, payments, allocations, deductions) are never… | US-15 | TC-PAY-10, TC-PAY-11 | 0 of 2 | R-06 |
+| NFR-02 | Must | Ledger rows (charges, payments, allocations, deductions) are never… | US-15 | TC-PAY-10, TC-PAY-11 | 2 of 2 | R-06 |
 | NFR-03 | Must | Every table has RLS enabled; an automated test proves user B cannot… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
 | NFR-04 | Must | Balances and statuses are derived from ledger rows, never stored by… | US-16 | TC-PAY-12, TC-PAY-13 | 2 of 2 | — |
 | NFR-05 | Must | Every ledger row records who created it and when. | US-12 | TC-PAY-01, TC-PAY-02, TC-PAY-03 | 3 of 3 | — |
@@ -61,8 +61,8 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-12 | Record a payment | S2 | `src/app/(app)/leases/[id]/payment-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:88`<br>`supabase/migrations/20261018110000_payments_ledger.sql:1` |
 | US-13 | Partial payments | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`src/app/(app)/leases/[id]/payment-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:88`<br>`supabase/migrations/20261018110000_payments_ledger.sql:1` |
 | US-14 | Overpayment becomes credit | S2 | `supabase/migrations/20261018110000_payments_ledger.sql:2` |
-| US-15 | Reverse a bounced payment | S2 | `supabase/migrations/20261018110000_payments_ledger.sql:76` |
-| US-16 | Lease ledger | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`supabase/migrations/20261018110000_payments_ledger.sql:2` |
+| US-15 | Reverse a bounced payment | S2 | `src/app/(app)/leases/[id]/reverse-form.tsx:2`<br>`src/app/(app)/leases/actions.ts:134`<br>`supabase/migrations/20261018110000_payments_ledger.sql:76`<br>`supabase/migrations/20261018120000_payment_reversals.sql:1` |
+| US-16 | Lease ledger | S2 | `src/app/(app)/leases/[id]/money.tsx:1`<br>`supabase/migrations/20261018110000_payments_ledger.sql:2`<br>`supabase/migrations/20261018120000_payment_reversals.sql:145` |
 | US-17 | Record a deposit | S1 | `src/app/(app)/leases/[id]/page.tsx:14`<br>`src/app/(app)/leases/actions.ts:2`<br>`supabase/migrations/20261017100300_leases_deposits.sql:2` |
 | US-18 | Deposit deductions | S3 | — |
 | US-19 | Refund or amount owed | S3 | `supabase/migrations/20261018100000_charges.sql:4` |
@@ -142,9 +142,13 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-PAY-08 | US-14 | TC-PAY-08 Given a December charge of 1,200.00 and nothing else open, when I record 1,500.00, then December is paid and the lease shows credit 300.00 | `e2e/payments.spec.ts:88` |
 | TC-PAY-09 | US-14 | TC-PAY-09 Given credit of 300.00, when January's 1,200.00 charge is generated, then 300.00 is allocated to it and its balance is 900.00 | `tests/db/payments.test.ts:175` |
 | TC-PAY-09 | US-14 | TC-PAY-09 Given credit of 300.00, when January's 1,200.00 charge is generated, then 300.00 is applied to it, shown as a ledger row | `e2e/payments.spec.ts:95` |
+| TC-PAY-10 | US-15 | TC-PAY-10 Given a 1,200.00 payment fully allocated to December, when I reverse it with reason 'bounced', then December's balance returns to 1,200.00 and the payment shows as reversed | `tests/db/reversals.test.ts:24` |
+| TC-PAY-10 | US-15 | TC-PAY-10 Given a 1,200.00 payment allocated to December, when I reverse it with reason 'bounced', then December's balance is 1,200.00 again and the payment shows as reversed | `e2e/reversals.spec.ts:9` |
+| TC-PAY-11 | US-15 | TC-PAY-11 Given any payment, when someone deletes it by SQL as the database owner, then the delete is rejected | `tests/db/reversals.test.ts:35` |
 | TC-PAY-12 | US-16 | TC-PAY-12 Given charges, payments and allocations on a lease, when I open its ledger, then every row is in date order with a running balance | `tests/db/ledger.test.ts:34` |
 | TC-PAY-12 | US-16 | TC-PAY-12 Given charges and payments on a lease, when I open it, then the ledger runs in date order with a running balance | `e2e/payments.spec.ts:108` |
 | TC-PAY-13 | US-16 | TC-PAY-13 Given a lease with history, when I compare the final running balance with charge balances minus credit, then they're equal | `tests/db/ledger.test.ts:57` |
+| TC-PAY-13 | US-16 | Given a reversal, when I read the ledger, then it shows the reversal and the balance goes back up, and still ties out (TC-PAY-13) | `tests/db/reversals.test.ts:101` |
 | TC-DEP-01 | US-17 | TC-DEP-01 Given a draft lease, when I record a deposit of 1,200.00 received 2026-10-25, then it appears in the deposit section | `tests/db/leases.test.ts:151` |
 | TC-DEP-01 | US-17 | Given a deposit on the lease, when I open the rent ledger, then the deposit isn't in it (TC-DEP-01, D-08) | `tests/db/ledger.test.ts:72` |
 | TC-DEP-01 | US-17 | TC-DEP-01 Given a draft lease, when I record a deposit of 1,200.00 received 2026-10-25, then it appears in the deposit section | `e2e/leases.spec.ts:99` |
@@ -159,7 +163,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:104` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (26): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-PAY-10, TC-PAY-11, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (24): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -180,5 +184,5 @@ UAT cases with no automated test yet (26): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 44 of 70
+- UAT cases with an automated test: 46 of 70
 - Link errors: 0

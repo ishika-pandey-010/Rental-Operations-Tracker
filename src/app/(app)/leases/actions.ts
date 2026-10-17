@@ -130,3 +130,19 @@ export async function recordPayment(_prev: FormState, formData: FormData): Promi
   revalidatePath(`/leases/${values.lease_id}`);
   return succeed(`Payment of ${formatMoney(amount.cents)} recorded`, { method: values.method, paid_on: values.paid_on });
 }
+
+// US-15 Reverse a bounced payment
+export async function reversePayment(_prev: FormState, formData: FormData): Promise<FormState> {
+  const values = pick(formData, ["lease_id", "payment_id", "reason", "reversed_on"]);
+  if (!values.reason) return fail("Add a reason, for example 'bounced'", values);
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reverse_payment", {
+    p_payment_id: values.payment_id,
+    p_reversed_on: values.reversed_on,
+    p_reason: values.reason,
+  });
+  if (error) return fail(dbErrorMessage(error), values);
+  revalidatePath(`/leases/${values.lease_id}`);
+  done(values.lease_id, "Payment reversed. Its charges are open again.");
+  return {};
+}
