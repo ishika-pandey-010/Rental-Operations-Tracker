@@ -2,7 +2,9 @@
 """Build docs/traceability.md and check that every ID links up.
 
 Reads:  docs/PRD.md (FR-/NFR-), docs/user-stories.md (US-),
-        docs/uat/test-cases.csv (TC-), docs/risk-log.md (R-)
+        docs/uat/test-cases.csv (TC-), docs/risk-log.md (R-),
+        test names in tests/ and e2e/ (TC- IDs they automate),
+        US- tags in comments under src/ and supabase/migrations/ (where a story is built)
 Writes: docs/traceability.md
 Exits 1 if a link is broken or a Must requirement has no story or test.
 
@@ -19,6 +21,8 @@ ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 REQ_RE = re.compile(r"\b(?:FR|NFR)-\d{2}\b")
 TC_RE = re.compile(r"\bTC-[A-Z]+-\d{2}\b")
+US_RE = re.compile(r"\bUS-\d{2}\b")
+TEST_RE = re.compile(r"""\b(?:it|test)(?:\.\w+)?\(\s*(["'`])(.+?)\1""")
 
 
 def read_requirements():
@@ -68,11 +72,55 @@ def read_risks():
     return risks
 
 
+def read_automated_tests():
+    """Every test whose name cites a TC ID: [(tc, 'path:line', name)]."""
+    found = []
+    for folder, pattern in (("tests", "*.test.ts"), ("e2e", "*.spec.ts")):
+        for path in sorted((ROOT / folder).rglob(pattern)) if (ROOT / folder).exists() else []:
+            for n, line in enumerate(path.read_text().splitlines(), 1):
+                m = TEST_RE.search(line)
+                if m:
+                    for tc in TC_RE.findall(m.group(2)):
+                        found.append((tc, f"{path.relative_to(ROOT)}:{n}", m.group(2)))
+    return found
+
+
+def read_code_tags():
+    """Where each story is built: US ID -> ['path:line', ...], first tag per file."""
+    tags = defaultdict(list)
+    sources = []
+    if (ROOT / "src").exists():
+        sources += sorted(p for p in (ROOT / "src").rglob("*") if p.suffix in (".ts", ".tsx"))
+    if (ROOT / "supabase" / "migrations").exists():
+        sources += sorted((ROOT / "supabase" / "migrations").glob("*.sql"))
+    for path in sources:
+        seen = set()
+        for n, line in enumerate(path.read_text().splitlines(), 1):
+            if "//" not in line and "--" not in line and "*" not in line:
+                continue
+            for us in US_RE.findall(line):
+                if us not in seen:
+                    seen.add(us)
+                    tags[us].append(f"{path.relative_to(ROOT)}:{n}")
+    return tags
+
+
 def main():
     check_only = "--check" in sys.argv
     reqs, stories, cases, risks = read_requirements(), read_stories(), read_cases(), read_risks()
+    automated, code_tags = read_automated_tests(), read_code_tags()
     case_ids = {c["id"] for c in cases}
+    case_story = {c["id"]: c["story"] for c in cases}
     errors = []
+
+    tc_to_tests = defaultdict(list)
+    for tc, where, name in automated:
+        if tc not in case_ids:
+            errors.append(f"{where} cites unknown test case {tc}")
+        tc_to_tests[tc].append((where, name))
+    for us in code_tags:
+        if us not in stories:
+            errors.append(f"{code_tags[us][0]} tags unknown story {us}")
 
     # links from each side
     req_to_stories = defaultdict(list)
@@ -124,17 +172,50 @@ def main():
         "",
         "## Requirement → story → test → risk",
         "",
-        "| Req | Priority | Requirement | Stories | UAT cases | Risks |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "Automated: how many of the row's UAT cases have at least one automated test citing them.",
+        "",
+        "| Req | Priority | Requirement | Stories | UAT cases | Automated | Risks |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for rid, r in reqs.items():
         tcs = sorted(set(req_to_cases[rid]))
         rks = sorted({rk for tc in tcs for rk in tc_to_risks[tc]})
+        auto = sum(1 for tc in tcs if tc_to_tests[tc])
         short = r["text"] if len(r["text"]) <= 70 else r["text"][:67].rstrip() + "…"
         out.append(
             f"| {rid} | {r['priority']} | {short} | {', '.join(req_to_stories[rid]) or '—'} "
-            f"| {', '.join(tcs) or '—'} | {', '.join(rks) or '—'} |"
+            f"| {', '.join(tcs) or '—'} | {auto} of {len(tcs)} | {', '.join(rks) or '—'} |"
         )
+
+    out += [
+        "",
+        "## Story → code",
+        "",
+        "Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.",
+        "",
+        "| Story | Title | Sprint | Built in |",
+        "| --- | --- | --- | --- |",
+    ]
+    for us, s in stories.items():
+        where = "<br>".join(f"`{w}`" for w in code_tags.get(us, [])) or "—"
+        out.append(f"| {us} | {s['title']} | {s['sprint']} | {where} |")
+
+    out += [
+        "",
+        "## UAT case → automated test",
+        "",
+        "Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright). "
+        "An automated pass is not a UAT pass: UAT status in the next section comes only from the UAT sheet.",
+        "",
+        "| UAT case | Story | Test | Where |",
+        "| --- | --- | --- | --- |",
+    ]
+    for c in cases:
+        for where, name in tc_to_tests.get(c["id"], []):
+            label = name.replace("|", "\\|")
+            out.append(f"| {c['id']} | {case_story[c['id']]} | {label} | `{where}` |")
+    not_automated = [c["id"] for c in cases if not tc_to_tests[c["id"]]]
+    out += ["", f"UAT cases with no automated test yet ({len(not_automated)}): {', '.join(not_automated) or 'none'}."]
 
     status = Counter(c["status"] for c in cases)
     by_module = defaultdict(Counter)
@@ -161,6 +242,7 @@ def main():
         f"- Requirements: {len(reqs)} ({len(must)} Must); Must requirements with at least one UAT case: {len(covered)} of {len(must)}",
         f"- Stories: {len(stories)}; with at least one UAT case: {sum(1 for s in stories if story_to_cases[s])} of {len(stories)}",
         f"- Risks: {len(risks)}; product risks with a proving test: {sum(1 for r in risks.values() if r['tcs'])}",
+        f"- UAT cases with an automated test: {len(cases) - len(not_automated)} of {len(cases)}",
         f"- Link errors: {len(errors)}",
         "",
     ]

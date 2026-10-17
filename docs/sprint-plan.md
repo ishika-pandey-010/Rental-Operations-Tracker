@@ -39,6 +39,15 @@ S1 is lighter on points because it also carries one-off setup: repo scaffold, lo
 | US-06 No active lease without a deposit decision | 3 | Activation trigger |
 | US-17 Record a deposit | 2 | Pulled into S1 because US-06 depends on it |
 
+**S1 build plan (written 2026-10-17, before any code).** S1 starts before discovery has run, on the owner's instruction (D-16, R-15). It's built in four branches, each merged into `dev` when its tests pass:
+
+1. `chore/s1-scaffold`: Next.js, Supabase CLI config, Vitest and Playwright set-up, `make` targets, the app CI job, and the docs check reading test names (D-18).
+2. `feature/US-01-sign-in`: email and password sign-up, sign-in and sign-out, and a middleware that sends signed-out visitors to `/signin?next=…`.
+3. `feature/US-02-03-04-setup-and-isolation`: properties, units and tenants, each table with RLS and composite owner keys (D-21), plus the generic cross-account suite that fails whenever a table is missing from it.
+4. `feature/US-05-06-17-leases-and-deposits`: leases with the overlap exclusion constraint, the rent schedule, deposits, the waiver, and the activation trigger.
+
+Left out of S1 on purpose: editing a lease after it's created (not in any story; a draft with a typo stays a draft), and the dashboard totals (US-23, S3). The home page in S1 is a getting-started checklist (OQ-07).
+
 ## S2 — Money flows
 
 | Story | Points | Notes |
