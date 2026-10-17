@@ -8,7 +8,7 @@ Automated: how many of the row's UAT cases have at least one automated test citi
 
 | Req | Priority | Requirement | Stories | UAT cases | Automated | Risks |
 | --- | --- | --- | --- | --- | --- | --- |
-| FR-01 | Must | A landlord can sign up, sign in and sign out with email (Supabase A… | US-01 | TC-AUTH-01, TC-AUTH-02, TC-AUTH-03, TC-AUTH-04, TC-AUTH-05 | 0 of 5 | — |
+| FR-01 | Must | A landlord can sign up, sign in and sign out with email (Supabase A… | US-01 | TC-AUTH-01, TC-AUTH-02, TC-AUTH-03, TC-AUTH-04, TC-AUTH-05 | 5 of 5 | — |
 | FR-02 | Must | A landlord can see and change only their own data, enforced by row-… | US-02 | TC-NFR-01, TC-NFR-02, TC-NFR-03, TC-NFR-04 | 4 of 4 | R-04 |
 | FR-03 | Must | Create, edit and archive properties and units. A unit can be archiv… | US-03 | TC-SETUP-01, TC-SETUP-02, TC-SETUP-03, TC-SETUP-04 | 4 of 4 | — |
 | FR-04 | Must | Create, edit and archive tenants with name and contact details. | US-04 | TC-SETUP-05, TC-SETUP-06, TC-SETUP-07 | 3 of 3 | — |
@@ -47,7 +47,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 
 | Story | Title | Sprint | Built in |
 | --- | --- | --- | --- |
-| US-01 | Sign up and sign in | S1 | — |
+| US-01 | Sign up and sign in | S1 | `src/app/(app)/page.tsx:5`<br>`src/app/auth/actions.ts:2`<br>`src/lib/auth.ts:1`<br>`src/lib/supabase/middleware.ts:6` |
 | US-02 | My data stays mine | S1 | — |
 | US-03 | Properties and units | S1 | — |
 | US-04 | Tenants | S1 | — |
@@ -69,7 +69,7 @@ Found from `US-nn` tags in comments under `src/` and `supabase/migrations/`.
 | US-20 | Overdue rent | S3 | — |
 | US-21 | Pending refunds | S3 | — |
 | US-22 | CSV export | S3 | — |
-| US-23 | Dashboard | S3 | — |
+| US-23 | Dashboard | S3 | `src/app/(app)/page.tsx:5` |
 
 ## UAT case → automated test
 
@@ -77,6 +77,13 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 
 | UAT case | Story | Test | Where |
 | --- | --- | --- | --- |
+| TC-AUTH-01 | US-01 | TC-AUTH-01 Given I'm on the sign-up page, when I enter a valid email and password, then my account is created and I land on an empty home page | `e2e/auth.spec.ts:6` |
+| TC-AUTH-02 | US-01 | TC-AUTH-02 Given Supabase says invalid credentials, when it's shown, then it reads 'Email or password is incorrect' | `tests/unit/auth.test.ts:19` |
+| TC-AUTH-02 | US-01 | TC-AUTH-02 Given I have an account, when I sign in with the wrong password, then I see 'Email or password is incorrect' and I'm not signed in | `e2e/auth.spec.ts:12` |
+| TC-AUTH-03 | US-01 | TC-AUTH-03 Given I'm signed in, when I sign out, then visiting any app page sends me to the sign-in page | `e2e/auth.spec.ts:23` |
+| TC-AUTH-04 | US-01 | TC-AUTH-04 Given the email is already registered, when it's shown, then it tells me to sign in instead | `tests/unit/auth.test.ts:24` |
+| TC-AUTH-04 | US-01 | TC-AUTH-04 Given an account exists for an email, when I sign up again with it, then I get a clear error and no second account | `e2e/auth.spec.ts:30` |
+| TC-AUTH-05 | US-01 | TC-AUTH-05 Given I'm signed out, when I open a lease URL directly, then I'm sent to sign in and land on that lease afterwards | `e2e/auth.spec.ts:41` |
 | TC-SETUP-01 | US-03 | TC-SETUP-01 Given I'm signed in, when I add '12 Elm St' with units A and B, then both units appear under that property | `tests/db/setup.test.ts:25` |
 | TC-SETUP-02 | US-03 | TC-SETUP-02 Given a property already has unit A, when I add another unit A, then it's refused as a duplicate label | `tests/db/setup.test.ts:39` |
 | TC-SETUP-03 | US-03 | TC-SETUP-03 Given unit A has an active lease, when I archive unit A, then I see 'Unit has an active lease' and it stays active | `tests/db/setup.test.ts:52` |
@@ -100,7 +107,7 @@ Found from TC IDs in test names under `tests/` (Vitest) and `e2e/` (Playwright).
 | TC-NFR-04 | US-02 | TC-NFR-04 Given A has a row in every table, when B reads every table and view, then B sees nothing of A's | `tests/db/rls.test.ts:90` |
 | TC-NFR-08 | NFR-01 | TC-NFR-08 Given the migrations are applied, when I list every *_cents column, then all are bigint and no float, real, double or numeric column exists | `tests/db/schema.test.ts:14` |
 
-UAT cases with no automated test yet (49): TC-AUTH-01, TC-AUTH-02, TC-AUTH-03, TC-AUTH-04, TC-AUTH-05, TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-05, TC-CHG-06, TC-CHG-07, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
+UAT cases with no automated test yet (44): TC-LEASE-08, TC-LEASE-09, TC-LEASE-10, TC-LEASE-11, TC-LEASE-12, TC-LEASE-13, TC-LEASE-14, TC-CHG-01, TC-CHG-02, TC-CHG-03, TC-CHG-04, TC-CHG-05, TC-CHG-06, TC-CHG-07, TC-PAY-01, TC-PAY-02, TC-PAY-03, TC-PAY-04, TC-PAY-05, TC-PAY-06, TC-PAY-07, TC-PAY-08, TC-PAY-09, TC-PAY-10, TC-PAY-11, TC-PAY-12, TC-PAY-13, TC-DEP-03, TC-DEP-04, TC-DEP-05, TC-DEP-06, TC-DEP-07, TC-DEP-08, TC-RPT-01, TC-RPT-02, TC-RPT-03, TC-RPT-04, TC-RPT-05, TC-RPT-06, TC-RPT-07, TC-NFR-05, TC-NFR-06, TC-NFR-07, TC-NFR-09.
 
 ## UAT sheet status
 
@@ -121,5 +128,5 @@ UAT cases with no automated test yet (49): TC-AUTH-01, TC-AUTH-02, TC-AUTH-03, T
 - Requirements: 32 (25 Must); Must requirements with at least one UAT case: 25 of 25
 - Stories: 23; with at least one UAT case: 23 of 23
 - Risks: 15; product risks with a proving test: 9
-- UAT cases with an automated test: 21 of 70
+- UAT cases with an automated test: 26 of 70
 - Link errors: 0
