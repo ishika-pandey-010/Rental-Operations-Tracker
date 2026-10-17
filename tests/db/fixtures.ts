@@ -153,3 +153,14 @@ export async function endedLease(db: Db) {
   await moveOut(db, lease.leaseId, "2027-02-10");
   return lease;
 }
+
+export async function renew(db: Db, leaseId: string, opts: { start?: string; end?: string; rentCents?: number; carry?: boolean } = {}) {
+  const { id } = await db.one<{ id: string }>("select renew_lease($1, $2, $3, $4, $5) as id", [
+    leaseId,
+    opts.start ?? "2027-11-01",
+    opts.end ?? "2028-10-31",
+    opts.rentCents ?? 125000,
+    opts.carry ?? false,
+  ]);
+  return id;
+}
