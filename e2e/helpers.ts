@@ -118,3 +118,20 @@ export async function leaseWithCharges(page: Page, months: string[]) {
   await page.goto(url);
   return url;
 }
+
+/** An active lease from 2026-11-01 with a 1,200.00 deposit, moved out on 2027-02-10. Returns the lease URL. */
+export async function endedLeaseUI(page: Page) {
+  const url = await leaseWithCharges(page, []);
+  const section = page.getByRole("region", { name: "Move-out" });
+  await section.getByLabel("Move-out date").fill("2027-02-10");
+  await section.getByRole("button", { name: "Record move-out" }).click();
+  await expect(page.getByTestId("lease-status")).toHaveText("Ended");
+  return url;
+}
+
+export async function addDeductionUI(page: Page, amount: string, reason: string) {
+  const deposit = page.getByRole("region", { name: "Deposit" });
+  await deposit.getByLabel("Deduction amount").fill(amount);
+  await deposit.getByLabel("Reason").fill(reason);
+  await deposit.getByRole("button", { name: "Add deduction" }).click();
+}

@@ -86,6 +86,18 @@ Every money operation on a lease takes a per-lease advisory lock before it reads
 | Timed user test | — | Five users ([user-test-protocol.md](user-test-protocol.md)) |
 | User guide | — | `docs/user-guide.md`, used in the 10-minute walkthrough |
 
+**S3 build plan (written 2026-10-18, before any S3 code).** Musts first, then Shoulds, then the Could, following the cut line:
+
+1. `feature/US-18-19-deposit-settlement`: deductions (after the lease ends, reason required), the refund worked out as max(0, held − deductions) and checked by a trigger, "Deductions above deposit" charges for any excess (D-09), and a refund row that records it being paid (D-20).
+2. `feature/US-20-21-reports`: Overdue and Pending refunds, both taking an `as_of` date (OQ-19).
+3. `feature/US-07-rent-change`: a new rent row from a month that isn't charged yet.
+4. `feature/US-08-renewal` (Should): a new lease linked to the old one, deposit optionally carried over.
+5. `feature/US-22-csv-export` (Should): the ledger and both reports as CSV.
+6. `feature/US-23-dashboard` (Could): four totals on the home page once setup is done.
+7. `chore/NFR-09-seed-and-guide`: the one-command demo seed, `docs/user-guide.md`, and the README Results table generated from the UAT sheet and `user-test.md`.
+
+The UAT run and the timed user test need people and the hosted demo (OQ-16, OQ-18). They're not done in this build; their entry criteria are prepared instead.
+
 ## Ceremonies
 
 | Ceremony | When | Length | Output |

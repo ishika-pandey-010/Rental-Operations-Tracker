@@ -23,7 +23,7 @@ test.describe("US-12 Record a payment", () => {
   test("TC-PAY-02 Given TRX-881 is already recorded on this lease, when I record another payment with TRX-881, then I see 'This reference is already recorded for this lease'", async ({ page }) => {
     await leaseWithCharges(page, ["2026-12"]);
     await recordPaymentUI(page, { amount: "100", reference: "TRX-881" });
-    await expect(statusIn(page)).toBeVisible();
+    await expect(statusIn(page)).toHaveText("Payment of $100.00 recorded");
     await recordPaymentUI(page, { amount: "200", reference: "TRX-881" });
     await expect(alertIn(page)).toHaveText("This reference is already recorded for this lease");
     await expect(page.getByLabel("Amount received")).toHaveValue("200");
@@ -40,7 +40,7 @@ test.describe("US-12 Record a payment", () => {
   test("Given I recorded a cash payment last time, when I record the next one, then Method starts on Cash", async ({ page }) => {
     await leaseWithCharges(page, ["2026-12"]);
     await recordPaymentUI(page, { amount: "100", method: "Cash" });
-    await expect(statusIn(page)).toBeVisible();
+    await expect(statusIn(page)).toHaveText("Payment of $100.00 recorded");
     await expect(page.getByLabel("Method")).toHaveValue("cash");
   });
 });
@@ -108,7 +108,7 @@ test.describe("US-16 Lease ledger", () => {
   test("TC-PAY-12 Given charges and payments on a lease, when I open it, then the ledger runs in date order with a running balance", async ({ page }) => {
     await leaseWithCharges(page, ["2026-11", "2026-12"]);
     await recordPaymentUI(page, { amount: "1,000.00", paidOn: "2026-11-03", reference: "NOV" });
-    await expect(statusIn(page)).toBeVisible();
+    await expect(statusIn(page)).toHaveText("Payment of $1,000.00 recorded");
     const balances = page.getByRole("region", { name: "Ledger" }).getByTestId("running-balance");
     await expect(balances).toHaveText(["$1,200.00", "$200.00", "$1,400.00"]);
   });
